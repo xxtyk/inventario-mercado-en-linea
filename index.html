@@ -1,1 +1,106 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario Mercado</title>
+
+<style>
+body{
+  font-family:Arial;
+  margin:0;
+  background:#111;
+  color:#fff;
+  text-align:center;
+}
+
+h1{
+  background:#000;
+  padding:20px;
+}
+
+.container{
+  padding:20px;
+}
+
+input, button{
+  padding:12px;
+  margin:8px;
+  width:90%;
+  max-width:300px;
+  font-size:16px;
+}
+
+button{
+  background:#0a84ff;
+  color:white;
+  border:none;
+  border-radius:8px;
+}
+
+.card{
+  background:#222;
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Inventario</h1>
+
+<div class="container">
+
+<input id="nombre" placeholder="Nombre del producto">
+<input id="cantidad" type="number" placeholder="Cantidad">
+
+<button onclick="agregar()">Agregar producto</button>
+
+<div id="lista"></div>
+
+</div>
+
+<script>
+let productos = [];
+
+function agregar(){
+  let nombre = document.getElementById("nombre").value;
+  let cantidad = parseInt(document.getElementById("cantidad").value);
+
+  if(!nombre || !cantidad){
+    alert("Llena todos los campos");
+    return;
+  }
+
+  productos.push({nombre, cantidad});
+  mostrar();
+}
+
+function vender(index){
+  if(productos[index].cantidad > 0){
+    productos[index].cantidad--;
+  }
+  mostrar();
+}
+
+function mostrar(){
+  let lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  productos.forEach((p, i)=>{
+    lista.innerHTML += `
+      <div class="card">
+        <h3>${p.nombre}</h3>
+        <p>Stock: ${p.cantidad}</p>
+        <button onclick="vender(${i})">Vender 1</button>
+      </div>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
