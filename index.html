@@ -4,126 +4,279 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>InventApp</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#070b16;color:white;padding-bottom:110px}
+body{margin:0;font-family:Arial,sans-serif;background:#070b16;color:white;padding-bottom:120px}
 header{background:#0b1020;padding:18px;font-size:28px;font-weight:bold}
 .container{padding:18px}
-.subtitulo{color:#a56cff;font-weight:bold}
-h1{font-size:30px;margin:10px 0}
-input{width:100%;padding:15px;font-size:20px;border-radius:12px;margin-bottom:10px}
+h1{font-size:30px}
+input,textarea{width:100%;padding:15px;margin:8px 0;font-size:20px;border-radius:12px;border:0}
 button{border:0;border-radius:14px;padding:14px;font-size:20px;color:white;background:#8b5cf6}
-.card{background:#111827;border-radius:20px;padding:18px;margin-bottom:12px}
-.num{font-size:28px}
-.cerrar{position:fixed;bottom:18px;left:18px;right:18px;background:#8b5cf6;font-size:24px}
+.login{max-width:420px;margin:40px auto;background:#111827;padding:20px;border-radius:20px}
+.card,.box,.formulario{background:#111827;border:1px solid #263247;border-radius:20px;padding:18px;margin-bottom:15px}
+.totales{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.box{text-align:center}
+.box b{font-size:32px;display:block}
+.verde{color:#31d079}.morado{color:#9b5cff}
+.fila{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;align-items:center}
+.num{font-size:30px;font-weight:bold}
+.btn-mini{width:48px;height:48px;border-radius:50%;margin:4px}
+.btn-menos{background:#1b2233}
+.cerrar{position:fixed;bottom:18px;left:18px;right:18px;background:#8b5cf6;font-size:26px;font-weight:bold}
+.oculto{display:none}
+.error{color:#ff8080;margin-top:10px}
 </style>
 </head>
 <body>
 
-<header>📦 Inventario</header>
+<header>📦 InventApp</header>
 
-<div class="container">
-
-<div class="subtitulo">DÍA</div>
-<h1 id="fecha"></h1>
-
-<input id="fechaManual" type="date">
-
-<input id="nombre" placeholder="Producto">
-<input id="cantidad" type="number" placeholder="Cantidad">
-
-<button onclick="agregar()">Agregar</button>
-
-<div id="lista"></div>
-
+<div id="login" class="login">
+  <h2>Entrar al inventario</h2>
+  <input id="email" type="email" value="htolosarodriguez@gmail.com" placeholder="Correo">
+  <input id="password" type="password" placeholder="Contraseña">
+  <button onclick="login()">Entrar</button>
+  <div id="error" class="error"></div>
 </div>
 
-<button class="cerrar" onclick="cerrarDia()">Cerrar día</button>
+<div id="app" class="container oculto">
+  <button onclick="logout()">Cerrar sesión</button>
+
+  <h1 id="fechaTexto"></h1>
+  <input id="fechaManual" type="date" onchange="cargarInventario()">
+
+  <div class="totales">
+    <div class="box">Inicio<b id="inicioTotal">0</b></div>
+    <div class="box">Vendido<b class="verde" id="vendidoTotal">0</b></div>
+    <div class="box">Final<b class="morado" id="finalTotal">0</b></div>
+  </div>
+
+  <div id="lista"></div>
+
+  <div class="formulario">
+    <h2>+ Agregar producto</h2>
+    <input id="nombre" placeholder="Nombre del producto">
+    <input id="cantidad" type="number" placeholder="Cantidad inicial">
+    <button onclick="agregarProducto()">Agregar producto</button>
+  </div>
+
+  <div class="formulario">
+    <h2>📝 Notas del día</h2>
+    <textarea id="notas" placeholder="Notas..."></textarea>
+  </div>
+</div>
+
+<button id="btnCerrar" class="cerrar oculto" onclick="cerrarDia()">🌙 Cerrar día</button>
 
 <script>
-let productos = JSON.parse(localStorage.getItem("productos")) || [];
-let historial = JSON.parse(localStorage.getItem("historial")) || [];
+const SUPABASE_URL = "https://nbeztoulibouaiwhkkzx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_rBfUEuSG0oN__EW38QL68w_1rJ-deQp";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let productos = [];
+let registroId = null;
 
 const fechaInput = document.getElementById("fechaManual");
 
 function hoy(){
-  const f = new Date();
-  return f.toISOString().split("T")[0];
+  return new Date().toISOString().split("T")[0];
 }
 
-fechaInput.value = localStorage.getItem("fecha") || hoy();
+fechaInput.value = hoy();
 
 function textoFecha(){
   const p = fechaInput.value.split("-");
   const f = new Date(p[0], p[1]-1, p[2]);
-  return f.toLocaleDateString("es-MX",{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  return f.toLocaleDateString("es-MX",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 }
 
-document.getElementById("fecha").innerText = textoFecha();
+async function login(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-fechaInput.onchange = () => {
-  localStorage.setItem("fecha", fechaInput.value);
-  document.getElementById("fecha").innerText = textoFecha();
-};
+  const { error } = await db.auth.signInWithPassword({ email, password });
 
-function guardar(){
-  localStorage.setItem("productos", JSON.stringify(productos));
+  if(error){
+    document.getElementById("error").innerText = "Correo o contraseña incorrectos";
+    return;
+  }
+
+  mostrarApp();
+}
+
+async function logout(){
+  await db.auth.signOut();
+  location.reload();
+}
+
+async function revisarSesion(){
+  const { data } = await db.auth.getSession();
+  if(data.session) mostrarApp();
+}
+
+async function mostrarApp(){
+  document.getElementById("login").classList.add("oculto");
+  document.getElementById("app").classList.remove("oculto");
+  document.getElementById("btnCerrar").classList.remove("oculto");
+  await cargarInventario();
+}
+
+async function cargarInventario(){
+  document.getElementById("fechaTexto").innerText = textoFecha();
+
+  registroId = null;
+  productos = [];
+  document.getElementById("notas").value = "";
+
+  let { data, error } = await db
+    .from("inventario")
+    .select("*")
+    .eq("Fecha", fechaInput.value)
+    .limit(1);
+
+  if(error){
+    alert("Error al cargar: " + error.message);
+    return;
+  }
+
+  if(data && data.length > 0){
+    registroId = data[0].id;
+    const guardado = data[0].Data || {};
+    productos = guardado.productos || [];
+    document.getElementById("notas").value = guardado.notas || "";
+  }
+
   mostrar();
 }
 
-function agregar(){
-  let n = document.getElementById("nombre").value;
-  let c = parseInt(document.getElementById("cantidad").value);
+async function guardarInventario(){
+  const datos = {
+    productos: productos,
+    notas: document.getElementById("notas").value,
+    actualizado: new Date().toISOString()
+  };
 
-  if(!n || !c){alert("Datos");return;}
+  if(registroId){
+    const { error } = await db
+      .from("inventario")
+      .update({ Data: datos })
+      .eq("id", registroId);
 
-  productos.push({nombre:n,inicio:c,vendido:0});
-  document.getElementById("nombre").value="";
-  document.getElementById("cantidad").value="";
-  guardar();
+    if(error) alert("Error al guardar: " + error.message);
+  } else {
+    const { data, error } = await db
+      .from("inventario")
+      .insert([{ Fecha: fechaInput.value, Data: datos }])
+      .select()
+      .single();
+
+    if(error){
+      alert("Error al crear día: " + error.message);
+      return;
+    }
+
+    registroId = data.id;
+  }
 }
 
-function vender(i){
+async function agregarProducto(){
+  const nombre = document.getElementById("nombre").value.trim();
+  const cantidad = parseInt(document.getElementById("cantidad").value);
+
+  if(!nombre || isNaN(cantidad)){
+    alert("Escribe producto y cantidad");
+    return;
+  }
+
+  productos.push({ nombre, inicio:cantidad, vendido:0 });
+
+  document.getElementById("nombre").value="";
+  document.getElementById("cantidad").value="";
+
+  await guardarInventario();
+  mostrar();
+}
+
+async function vender(i){
   if(productos[i].vendido < productos[i].inicio){
     productos[i].vendido++;
-    guardar();
+    await guardarInventario();
+    mostrar();
+  }
+}
+
+async function regresar(i){
+  if(productos[i].vendido > 0){
+    productos[i].vendido--;
+    await guardarInventario();
+    mostrar();
+  }
+}
+
+async function borrar(i){
+  if(confirm("¿Borrar producto?")){
+    productos.splice(i,1);
+    await guardarInventario();
+    mostrar();
   }
 }
 
 function mostrar(){
-  let html="";
+  let lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  let inicioTotal = 0;
+  let vendidoTotal = 0;
+  let finalTotal = 0;
+
   productos.forEach((p,i)=>{
-    html+=`
-    <div class="card">
-      <b>${p.nombre}</b><br>
-      Inicio: ${p.inicio} <br>
-      Vendido: ${p.vendido} 
-      <button onclick="vender(${i})">+</button><br>
-      Final: ${p.inicio-p.vendido}
-    </div>`;
+    let final = p.inicio - p.vendido;
+    inicioTotal += p.inicio;
+    vendidoTotal += p.vendido;
+    finalTotal += final;
+
+    lista.innerHTML += `
+      <div class="card">
+        <button onclick="borrar(${i})" style="float:right;background:#222">🗑️</button>
+        <h2>${p.nombre}</h2>
+        <div class="fila">
+          <div>Inicio<div class="num">${p.inicio}</div></div>
+          <div>Vendido<br>
+            <button class="btn-mini btn-menos" onclick="regresar(${i})">−</button>
+            <span class="num verde">${p.vendido}</span>
+            <button class="btn-mini" onclick="vender(${i})">+</button>
+          </div>
+          <div>Final<div class="num morado">${final}</div></div>
+        </div>
+      </div>
+    `;
   });
-  document.getElementById("lista").innerHTML = html;
+
+  document.getElementById("inicioTotal").innerText = inicioTotal;
+  document.getElementById("vendidoTotal").innerText = vendidoTotal;
+  document.getElementById("finalTotal").innerText = finalTotal;
 }
 
-function cerrarDia(){
-  let reg = {
-    fecha: textoFecha(),
-    total: productos.reduce((a,p)=>a+p.vendido,0)
-  };
+document.getElementById("notas").addEventListener("input", guardarInventario);
 
-  historial.unshift(reg);
-  localStorage.setItem("historial", JSON.stringify(historial));
+async function cerrarDia(){
+  if(!confirm("¿Cerrar este día?")){
+    return;
+  }
 
   productos = productos.map(p=>({
     nombre:p.nombre,
-    inicio:p.inicio-p.vendido,
+    inicio:p.inicio - p.vendido,
     vendido:0
-  }));
+  })).filter(p=>p.inicio > 0);
 
-  guardar();
+  await guardarInventario();
+  mostrar();
+  alert("Día cerrado y guardado en internet");
 }
 
-mostrar();
+revisarSesion();
 </script>
 
 </body>
