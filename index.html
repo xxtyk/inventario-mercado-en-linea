@@ -1,105 +1,372 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inventario Mercado</title>
-
+<title>InventApp</title>
 <style>
+*{box-sizing:border-box}
 body{
-  font-family:Arial;
   margin:0;
-  background:#111;
-  color:#fff;
+  font-family:Arial,sans-serif;
+  background:#070b16;
+  color:white;
+  padding-bottom:110px;
+}
+header{
+  background:#0b1020;
+  padding:18px;
+  font-size:28px;
+  font-weight:bold;
+  border-bottom:1px solid #222b3d;
+}
+.container{padding:18px}
+.subtitulo{
+  color:#a56cff;
+  font-weight:bold;
+  letter-spacing:1px;
+}
+h1{font-size:34px;margin:10px 0 20px}
+.totales{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
+  margin-bottom:22px;
+}
+.box{
+  background:#111827;
+  border:1px solid #263247;
+  border-radius:18px;
+  padding:15px;
   text-align:center;
 }
-
-h1{
-  background:#000;
-  padding:20px;
+.box span{color:#9ca3af;font-size:16px}
+.box b{display:block;font-size:32px;margin-top:8px}
+.verde{color:#31d079}
+.morado{color:#9b5cff}
+.card{
+  background:#111827;
+  border:1px solid #263247;
+  border-radius:22px;
+  padding:22px;
+  margin-bottom:18px;
 }
-
-.container{
-  padding:20px;
+.card h2{
+  margin:0 0 22px;
+  font-size:27px;
 }
-
-input, button{
-  padding:12px;
-  margin:8px;
-  width:90%;
-  max-width:300px;
+.fila{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  text-align:center;
+  align-items:center;
+}
+.label{color:#9ca3af;font-size:17px}
+.num{font-size:34px;font-weight:bold;margin-top:8px}
+.controles{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+}
+button{
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  font-size:22px;
+  color:white;
+  background:#8b5cf6;
+}
+.btn-mini{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+}
+.btn-menos{background:#1b2233}
+.btn-borrar{
+  float:right;
+  background:transparent;
+  color:#9ca3af;
+  font-size:24px;
+}
+.progreso{
+  height:10px;
+  background:#1e293b;
+  border-radius:20px;
+  margin-top:22px;
+  overflow:hidden;
+}
+.barra{
+  height:100%;
+  background:#8b5cf6;
+  width:0%;
+}
+.porcentaje{
+  color:#9ca3af;
+  text-align:right;
+  margin-top:8px;
   font-size:16px;
 }
-
-button{
-  background:#0a84ff;
-  color:white;
-  border:none;
-  border-radius:8px;
+.formulario{
+  background:#111827;
+  border:1px dashed #8b5cf6;
+  border-radius:22px;
+  padding:18px;
+  margin-top:25px;
 }
-
-.card{
-  background:#222;
-  margin:10px;
-  padding:10px;
+input,textarea{
+  width:100%;
+  padding:16px;
+  margin:10px 0;
+  font-size:20px;
   border-radius:10px;
+  border:1px solid #334155;
+}
+.btn-agregar{
+  width:100%;
+  margin-top:10px;
+  font-weight:bold;
+}
+textarea{height:110px}
+.cerrar{
+  position:fixed;
+  bottom:18px;
+  left:18px;
+  right:18px;
+  background:#8b5cf6;
+  font-size:26px;
+  font-weight:bold;
+  border-radius:22px;
+}
+.historial{
+  background:#111827;
+  border:1px solid #263247;
+  border-radius:20px;
+  padding:18px;
+  margin-top:20px;
+}
+.historial h2{margin-top:0}
+.itemHistorial{
+  border-bottom:1px solid #263247;
+  padding:10px 0;
+  color:#ddd;
 }
 </style>
 </head>
-
 <body>
 
-<h1>Inventario</h1>
+<header>📦 InventApp</header>
 
 <div class="container">
+  <div class="subtitulo">INVENTARIO DEL DÍA</div>
+  <h1 id="fecha"></h1>
 
-<input id="nombre" placeholder="Nombre del producto">
-<input id="cantidad" type="number" placeholder="Cantidad">
+  <div class="totales">
+    <div class="box"><span>Inicio total</span><b id="inicioTotal">0</b></div>
+    <div class="box"><span>Vendido</span><b class="verde" id="vendidoTotal">0</b></div>
+    <div class="box"><span>Final total</span><b class="morado" id="finalTotal">0</b></div>
+  </div>
 
-<button onclick="agregar()">Agregar producto</button>
+  <div id="lista"></div>
 
-<div id="lista"></div>
+  <div class="formulario">
+    <h2>+ Agregar producto</h2>
+    <input id="nombre" placeholder="Nombre del producto">
+    <input id="cantidad" type="number" placeholder="Cantidad inicial">
+    <button class="btn-agregar" onclick="agregarProducto()">Agregar producto</button>
+  </div>
 
+  <div class="formulario">
+    <h2>📝 Notas del día</h2>
+    <textarea id="notas" placeholder="Ej: El repartidor recoge sobrantes a las 6pm..."></textarea>
+  </div>
+
+  <div class="historial">
+    <h2>📅 Historial</h2>
+    <div id="historial"></div>
+  </div>
 </div>
 
+<button class="cerrar" onclick="cerrarDia()">🌙 Cerrar día</button>
+
 <script>
-let productos = [];
+let productos = JSON.parse(localStorage.getItem("productosInventario")) || [];
+let historial = JSON.parse(localStorage.getItem("historialInventario")) || [];
+let notas = localStorage.getItem("notasInventario") || "";
 
-function agregar(){
-  let nombre = document.getElementById("nombre").value;
-  let cantidad = parseInt(document.getElementById("cantidad").value);
+document.getElementById("notas").value = notas;
 
-  if(!nombre || !cantidad){
-    alert("Llena todos los campos");
-    return;
-  }
+document.getElementById("notas").addEventListener("input", function(){
+  localStorage.setItem("notasInventario", this.value);
+});
 
-  productos.push({nombre, cantidad});
+function fechaActual(){
+  const f = new Date();
+  const opciones = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  let texto = f.toLocaleDateString('es-MX', opciones);
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+document.getElementById("fecha").innerText = fechaActual();
+
+function guardar(){
+  localStorage.setItem("productosInventario", JSON.stringify(productos));
   mostrar();
 }
 
-function vender(index){
-  if(productos[index].cantidad > 0){
-    productos[index].cantidad--;
+function agregarProducto(){
+  const nombre = document.getElementById("nombre").value.trim();
+  const cantidad = parseInt(document.getElementById("cantidad").value);
+
+  if(!nombre || isNaN(cantidad)){
+    alert("Escribe nombre y cantidad");
+    return;
   }
-  mostrar();
+
+  productos.push({
+    nombre:nombre,
+    inicio:cantidad,
+    vendido:0
+  });
+
+  document.getElementById("nombre").value="";
+  document.getElementById("cantidad").value="";
+  guardar();
+}
+
+function vender(i){
+  if(productos[i].vendido < productos[i].inicio){
+    productos[i].vendido++;
+    guardar();
+  }
+}
+
+function regresar(i){
+  if(productos[i].vendido > 0){
+    productos[i].vendido--;
+    guardar();
+  }
+}
+
+function borrar(i){
+  if(confirm("¿Borrar producto?")){
+    productos.splice(i,1);
+    guardar();
+  }
 }
 
 function mostrar(){
   let lista = document.getElementById("lista");
   lista.innerHTML = "";
 
-  productos.forEach((p, i)=>{
+  let inicioTotal = 0;
+  let vendidoTotal = 0;
+  let finalTotal = 0;
+
+  productos.forEach((p,i)=>{
+    let final = p.inicio - p.vendido;
+    let porcentaje = p.inicio > 0 ? Math.round((p.vendido / p.inicio) * 100) : 0;
+
+    inicioTotal += p.inicio;
+    vendidoTotal += p.vendido;
+    finalTotal += final;
+
     lista.innerHTML += `
       <div class="card">
-        <h3>${p.nombre}</h3>
-        <p>Stock: ${p.cantidad}</p>
-        <button onclick="vender(${i})">Vender 1</button>
+        <button class="btn-borrar" onclick="borrar(${i})">🗑️</button>
+        <h2>${p.nombre}</h2>
+
+        <div class="fila">
+          <div>
+            <div class="label">Inicio</div>
+            <div class="num">${p.inicio}</div>
+          </div>
+
+          <div>
+            <div class="label">Vendido</div>
+            <div class="controles">
+              <button class="btn-mini btn-menos" onclick="regresar(${i})">−</button>
+              <div class="num verde">${p.vendido}</div>
+              <button class="btn-mini" onclick="vender(${i})">+</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="label">Final</div>
+            <div class="num morado">${final}</div>
+          </div>
+        </div>
+
+        <div class="progreso">
+          <div class="barra" style="width:${porcentaje}%"></div>
+        </div>
+        <div class="porcentaje">${porcentaje}% vendido</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("inicioTotal").innerText = inicioTotal;
+  document.getElementById("vendidoTotal").innerText = vendidoTotal;
+  document.getElementById("finalTotal").innerText = finalTotal;
+
+  mostrarHistorial();
+}
+
+function cerrarDia(){
+  if(productos.length === 0){
+    alert("No hay productos");
+    return;
+  }
+
+  if(!confirm("¿Cerrar el día y guardar historial?")){
+    return;
+  }
+
+  let registro = {
+    fecha: fechaActual(),
+    productos: productos,
+    notas: document.getElementById("notas").value,
+    inicio: productos.reduce((a,p)=>a+p.inicio,0),
+    vendido: productos.reduce((a,p)=>a+p.vendido,0),
+    final: productos.reduce((a,p)=>a+(p.inicio-p.vendido),0)
+  };
+
+  historial.unshift(registro);
+  localStorage.setItem("historialInventario", JSON.stringify(historial));
+
+  productos = productos.map(p=>({
+    nombre:p.nombre,
+    inicio:p.inicio - p.vendido,
+    vendido:0
+  })).filter(p=>p.inicio > 0);
+
+  localStorage.setItem("notasInventario","");
+  document.getElementById("notas").value="";
+
+  guardar();
+}
+
+function mostrarHistorial(){
+  let div = document.getElementById("historial");
+  div.innerHTML = "";
+
+  if(historial.length === 0){
+    div.innerHTML = "No hay días cerrados todavía.";
+    return;
+  }
+
+  historial.forEach(h=>{
+    div.innerHTML += `
+      <div class="itemHistorial">
+        <b>${h.fecha}</b><br>
+        Inicio: ${h.inicio} | Vendido: ${h.vendido} | Final: ${h.final}<br>
+        Nota: ${h.notas || "Sin nota"}
       </div>
     `;
   });
 }
+
+mostrar();
 </script>
 
 </body>
