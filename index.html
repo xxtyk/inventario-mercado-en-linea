@@ -77,6 +77,7 @@ button{
 
 .verde{color:#31d079}
 .morado{color:#9b5cff}
+.amarillo{color:#ffd166}
 
 .fila{
   display:grid;
@@ -112,20 +113,7 @@ button{
 
 .btn-menos{background:#1b2233}
 .btn-borrar{background:#222;margin-bottom:10px}
-
-.info{
-  background:#0b1222;
-  padding:12px;
-  border-radius:12px;
-  margin-top:12px;
-  line-height:1.5;
-}
-
-.info label{
-  display:block;
-  margin-top:8px;
-  font-weight:bold;
-}
+.btn-comisiones{background:#f59e0b;margin:12px 0;color:#111;font-weight:bold}
 
 .cerrar{
   position:fixed;
@@ -142,6 +130,23 @@ button{
 .error{
   color:#ff8080;
   margin-top:10px;
+}
+
+.tabla-comision{
+  background:#0b1222;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+
+.tabla-comision h3{
+  margin:0 0 8px;
+}
+
+.ganancia{
+  font-size:22px;
+  font-weight:bold;
+  color:#31d079;
 }
 </style>
 </head>
@@ -182,6 +187,15 @@ button{
 
   <input id="fechaManual" type="date" onchange="cargarInventario()">
 
+  <button class="btn-comisiones" onclick="mostrarComisiones()">
+    💰 Comisiones
+  </button>
+
+  <div id="seccionComisiones" class="formulario oculto">
+    <h2>💰 Costos, ventas y ganancias</h2>
+    <div id="listaComisiones"></div>
+  </div>
+
   <div class="totales">
     <div class="box">Inicio<b id="inicioTotal">0</b></div>
     <div class="box">Vendido<b class="verde" id="vendidoTotal">0</b></div>
@@ -196,8 +210,7 @@ button{
     <input id="nombre" placeholder="Nombre del producto">
     <input id="cantidad" type="number" placeholder="Cantidad inicial">
     <input id="costo" type="number" placeholder="Cuánto costó">
-    <input id="venta" type="number" placeholder="Cuánto se vende">
-    <input id="comision" type="number" placeholder="Comisión">
+    <input id="venta" type="number" placeholder="A cuánto se vende">
 
     <button onclick="agregarProducto()">Agregar producto</button>
   </div>
@@ -346,7 +359,6 @@ async function agregarProducto(){
   const cantidad = parseInt(document.getElementById("cantidad").value);
   const costo = parseFloat(document.getElementById("costo").value) || 0;
   const venta = parseFloat(document.getElementById("venta").value) || 0;
-  const comision = parseFloat(document.getElementById("comision").value) || 0;
 
   if(!nombre || isNaN(cantidad)){
     alert("Escribe producto y cantidad");
@@ -358,15 +370,13 @@ async function agregarProducto(){
     inicio:cantidad,
     vendido:0,
     costo,
-    venta,
-    comision
+    venta
   });
 
   document.getElementById("nombre").value = "";
   document.getElementById("cantidad").value = "";
   document.getElementById("costo").value = "";
   document.getElementById("venta").value = "";
-  document.getElementById("comision").value = "";
 
   await guardarInventario();
   mostrar();
@@ -412,6 +422,7 @@ async function editarDato(i, campo, valor){
   productos[i][campo] = valor;
 
   await guardarInventario();
+  mostrarComisiones(true);
 }
 
 async function borrar(i){
@@ -420,6 +431,40 @@ async function borrar(i){
     await guardarInventario();
     mostrar();
   }
+}
+
+function mostrarComisiones(mantenerAbierto){
+  const seccion = document.getElementById("seccionComisiones");
+
+  if(!mantenerAbierto){
+    seccion.classList.toggle("oculto");
+  }
+
+  const lista = document.getElementById("listaComisiones");
+  lista.innerHTML = "";
+
+  productos.forEach((p,i)=>{
+    if(p.costo === undefined) p.costo = 0;
+    if(p.venta === undefined) p.venta = 0;
+
+    const ganancia = p.venta - p.costo;
+
+    lista.innerHTML += `
+      <div class="tabla-comision">
+        <h3>${p.nombre}</h3>
+
+        <label>Cuánto costó</label>
+        <input type="number" value="${p.costo}" onchange="editarDato(${i}, 'costo', this.value)">
+
+        <label>A cuánto se vende</label>
+        <input type="number" value="${p.venta}" onchange="editarDato(${i}, 'venta', this.value)">
+
+        <div class="ganancia">
+          Ganancia: $${ganancia}
+        </div>
+      </div>
+    `;
+  });
 }
 
 function mostrar(){
@@ -433,7 +478,6 @@ function mostrar(){
   productos.forEach((p,i)=>{
     if(p.costo === undefined) p.costo = 0;
     if(p.venta === undefined) p.venta = 0;
-    if(p.comision === undefined) p.comision = 0;
 
     let final = p.inicio - p.vendido;
 
@@ -475,17 +519,6 @@ function mostrar(){
           </div>
         </div>
 
-        <div class="info">
-          <label>Costo</label>
-          <input type="number" value="${p.costo}" onchange="editarDato(${i}, 'costo', this.value)">
-
-          <label>Venta</label>
-          <input type="number" value="${p.venta}" onchange="editarDato(${i}, 'venta', this.value)">
-
-          <label>Comisión</label>
-          <input type="number" value="${p.comision}" onchange="editarDato(${i}, 'comision', this.value)">
-        </div>
-
       </div>
     `;
   });
@@ -493,6 +526,10 @@ function mostrar(){
   document.getElementById("inicioTotal").innerText = inicioTotal;
   document.getElementById("vendidoTotal").innerText = vendidoTotal;
   document.getElementById("finalTotal").innerText = finalTotal;
+
+  if(!document.getElementById("seccionComisiones").classList.contains("oculto")){
+    mostrarComisiones(true);
+  }
 }
 
 document.getElementById("notas").addEventListener("input", guardarInventario);
@@ -507,8 +544,7 @@ async function cerrarDia(){
     inicio:p.inicio - p.vendido,
     vendido:0,
     costo:p.costo || 0,
-    venta:p.venta || 0,
-    comision:p.comision || 0
+    venta:p.venta || 0
   })).filter(p=>p.inicio > 0);
 
   await guardarInventario();
