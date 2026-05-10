@@ -4,17 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>InventApp</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   font-family:Arial,sans-serif;
   background:#070b16;
-  color:white;
-  padding-bottom:130px;
+  color:#fff;
+  padding-bottom:120px;
 }
 
 header{
@@ -28,30 +31,6 @@ header{
   padding:18px;
 }
 
-h1{
-  font-size:30px;
-}
-
-input,textarea{
-  width:100%;
-  padding:15px;
-  margin:8px 0;
-  font-size:20px;
-  border-radius:12px;
-  border:0;
-  background:#fff;
-  color:#000;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:14px;
-  font-size:20px;
-  color:white;
-  background:#8b5cf6;
-}
-
 .login{
   max-width:420px;
   margin:40px auto;
@@ -60,7 +39,28 @@ button{
   border-radius:20px;
 }
 
-.card,.box,.formulario{
+input,textarea{
+  width:100%;
+  padding:15px;
+  margin:8px 0;
+  font-size:18px;
+  border-radius:12px;
+  border:0;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  font-size:18px;
+  color:white;
+  background:#8b5cf6;
+  width:100%;
+}
+
+.formulario,
+.card,
+.box{
   background:#111827;
   border:1px solid #263247;
   border-radius:20px;
@@ -79,12 +79,17 @@ button{
 }
 
 .box b{
-  font-size:32px;
+  font-size:30px;
   display:block;
 }
 
-.verde{color:#31d079}
-.morado{color:#9b5cff}
+.verde{
+  color:#31d079;
+}
+
+.morado{
+  color:#9b5cff;
+}
 
 .fila{
   display:grid;
@@ -94,13 +99,13 @@ button{
 }
 
 .num{
-  font-size:30px;
+  font-size:28px;
   font-weight:bold;
 }
 
 .btn-mini{
-  width:48px;
-  height:48px;
+  width:45px;
+  height:45px;
   border-radius:50%;
   margin:4px;
 }
@@ -111,28 +116,25 @@ button{
 
 .btn-editar{
   background:#2563eb;
-  margin-top:12px;
-  width:100%;
+  margin-top:10px;
 }
 
 .btn-mercancia{
   background:#16a34a;
   margin-top:10px;
-  width:100%;
 }
 
 .btn-borrar{
   background:#222;
-  float:right;
+  margin-bottom:10px;
 }
 
 .info{
-  margin-top:12px;
-  font-size:16px;
-  line-height:1.5;
   background:#0b1222;
   padding:12px;
   border-radius:12px;
+  margin-top:12px;
+  line-height:1.5;
 }
 
 .cerrar{
@@ -141,7 +143,7 @@ button{
   left:18px;
   right:18px;
   background:#8b5cf6;
-  font-size:26px;
+  font-size:24px;
   font-weight:bold;
 }
 
@@ -158,9 +160,12 @@ button{
 
 <body>
 
-<header>📦 InventApp</header>
+<header>
+📦 InventApp
+</header>
 
 <div id="loginBox" class="login">
+
   <h2>Entrar al inventario</h2>
 
   <input
@@ -170,17 +175,42 @@ button{
     placeholder="Correo"
   >
 
-  <input
-    id="password"
-    type="password"
-    placeholder="Contraseña"
-  >
+  <div style="position:relative">
 
-  <button onclick="iniciarSesion()">
+    <input
+      id="password"
+      type="password"
+      placeholder="Contraseña"
+      style="padding-right:60px"
+    >
+
+    <button
+      type="button"
+      onclick="verPassword()"
+      style="
+        position:absolute;
+        right:8px;
+        top:8px;
+        width:auto;
+        padding:10px;
+        background:#222;
+        font-size:16px;
+      "
+    >
+      👁️
+    </button>
+
+  </div>
+
+  <button
+    type="button"
+    onclick="iniciarSesion()"
+  >
     Entrar
   </button>
 
   <div id="error" class="error"></div>
+
 </div>
 
 <div id="app" class="container oculto">
@@ -222,7 +252,10 @@ button{
 
     <h2>+ Agregar producto</h2>
 
-    <input id="nombre" placeholder="Nombre del producto">
+    <input
+      id="nombre"
+      placeholder="Nombre del producto"
+    >
 
     <input
       id="cantidad"
@@ -245,7 +278,7 @@ button{
     <input
       id="comision"
       type="number"
-      placeholder="Comisión que da"
+      placeholder="Comisión"
     >
 
     <button onclick="agregarProducto()">
@@ -255,12 +288,14 @@ button{
   </div>
 
   <div class="formulario">
+
     <h2>📝 Notas del día</h2>
 
     <textarea
       id="notas"
       placeholder="Notas..."
     ></textarea>
+
   </div>
 
 </div>
@@ -270,10 +305,11 @@ button{
   class="cerrar oculto"
   onclick="cerrarDia()"
 >
-  🌙 Cerrar día
+🌙 Cerrar día
 </button>
 
 <script>
+
 const SUPABASE_URL =
 "https://nbeztoulibouaiwhkkzx.supabase.co";
 
@@ -294,11 +330,23 @@ document.getElementById("fechaManual");
 
 function hoy(){
   return new Date()
-    .toISOString()
-    .split("T")[0];
+  .toISOString()
+  .split("T")[0];
 }
 
 fechaInput.value = hoy();
+
+function verPassword(){
+
+  const pass =
+    document.getElementById("password");
+
+  if(pass.type === "password"){
+    pass.type = "text";
+  }else{
+    pass.type = "password";
+  }
+}
 
 function textoFecha(){
 
@@ -339,7 +387,8 @@ async function iniciarSesion(){
 
   if(error){
 
-    document.getElementById("error")
+    document
+    .getElementById("error")
     .innerText =
     "Correo o contraseña incorrectos";
 
@@ -394,20 +443,12 @@ async function cargarInventario(){
   .getElementById("notas")
   .value = "";
 
-  let { data, error } =
+  let { data } =
     await db
     .from("inventario")
     .select("*")
     .eq("Fecha", fechaInput.value)
     .limit(1);
-
-  if(error){
-    alert(
-      "Error al cargar: " +
-      error.message
-    );
-    return;
-  }
 
   if(data && data.length > 0){
 
@@ -435,30 +476,19 @@ async function guardarInventario(){
     notas:
       document
       .getElementById("notas")
-      .value,
-
-    actualizado:
-      new Date().toISOString()
+      .value
   };
 
   if(registroId){
 
-    const { error } =
-      await db
-      .from("inventario")
-      .update({ Data: datos })
-      .eq("id", registroId);
-
-    if(error){
-      alert(
-        "Error al guardar: " +
-        error.message
-      );
-    }
+    await db
+    .from("inventario")
+    .update({ Data: datos })
+    .eq("id", registroId);
 
   }else{
 
-    const { data, error } =
+    const { data } =
       await db
       .from("inventario")
       .insert([
@@ -469,14 +499,6 @@ async function guardarInventario(){
       ])
       .select()
       .single();
-
-    if(error){
-      alert(
-        "Error al crear día: " +
-        error.message
-      );
-      return;
-    }
 
     registroId = data.id;
   }
@@ -595,7 +617,7 @@ async function editarProducto(i){
 
   const nuevoNombre =
     prompt(
-      "Nombre del producto:",
+      "Nombre:",
       p.nombre
     );
 
@@ -603,57 +625,17 @@ async function editarProducto(i){
 
   const nuevoInicio =
     prompt(
-      "Cantidad inicio:",
+      "Cantidad:",
       p.inicio
     );
 
   if(nuevoInicio === null) return;
 
-  const nuevoCosto =
-    prompt(
-      "Cuánto costó:",
-      p.costo || 0
-    );
-
-  if(nuevoCosto === null) return;
-
-  const nuevaVenta =
-    prompt(
-      "Cuánto se vende:",
-      p.venta || 0
-    );
-
-  if(nuevaVenta === null) return;
-
-  const nuevaComision =
-    prompt(
-      "Comisión:",
-      p.comision || 0
-    );
-
-  if(nuevaComision === null) return;
-
   productos[i].nombre =
-    nuevoNombre.trim() || p.nombre;
+    nuevoNombre;
 
   productos[i].inicio =
     parseInt(nuevoInicio) || 0;
-
-  productos[i].costo =
-    parseFloat(nuevoCosto) || 0;
-
-  productos[i].venta =
-    parseFloat(nuevaVenta) || 0;
-
-  productos[i].comision =
-    parseFloat(nuevaComision) || 0;
-
-  if(productos[i].vendido >
-     productos[i].inicio){
-
-    productos[i].vendido =
-      productos[i].inicio;
-  }
 
   await guardarInventario();
 
@@ -685,15 +667,6 @@ function mostrar(){
 
   productos.forEach((p,i)=>{
 
-    if(p.costo === undefined)
-      p.costo = 0;
-
-    if(p.venta === undefined)
-      p.venta = 0;
-
-    if(p.comision === undefined)
-      p.comision = 0;
-
     let final =
       p.inicio - p.vendido;
 
@@ -723,6 +696,7 @@ function mostrar(){
           </div>
 
           <div>
+
             Vendido<br>
 
             <button
@@ -815,9 +789,9 @@ async function cerrarDia(){
 
       vendido:0,
 
-      costo:p.costo || 0,
-      venta:p.venta || 0,
-      comision:p.comision || 0
+      costo:p.costo,
+      venta:p.venta,
+      comision:p.comision
 
     }))
     .filter(p=>p.inicio > 0);
@@ -827,11 +801,12 @@ async function cerrarDia(){
   mostrar();
 
   alert(
-    "Día cerrado y guardado en internet"
+    "Día cerrado y guardado"
   );
 }
 
 revisarSesion();
+
 </script>
 
 </body>
