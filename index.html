@@ -160,90 +160,189 @@ button{
 
 <header>📦 InventApp</header>
 
-<div id="login" class="login">
+<div id="loginBox" class="login">
   <h2>Entrar al inventario</h2>
-  <input id="email" type="email" value="htolosarodriguez@gmail.com" placeholder="Correo">
-  <input id="password" type="password" placeholder="Contraseña">
-  <button onclick="login()">Entrar</button>
+
+  <input
+    id="email"
+    type="email"
+    value="htolosarodriguez@gmail.com"
+    placeholder="Correo"
+  >
+
+  <input
+    id="password"
+    type="password"
+    placeholder="Contraseña"
+  >
+
+  <button onclick="iniciarSesion()">
+    Entrar
+  </button>
+
   <div id="error" class="error"></div>
 </div>
 
 <div id="app" class="container oculto">
 
-  <button onclick="logout()">Cerrar sesión</button>
+  <button onclick="logout()">
+    Cerrar sesión
+  </button>
 
   <h1 id="fechaTexto"></h1>
-  <input id="fechaManual" type="date" onchange="cargarInventario()">
+
+  <input
+    id="fechaManual"
+    type="date"
+    onchange="cargarInventario()"
+  >
 
   <div class="totales">
-    <div class="box">Inicio<b id="inicioTotal">0</b></div>
-    <div class="box">Vendido<b class="verde" id="vendidoTotal">0</b></div>
-    <div class="box">Final<b class="morado" id="finalTotal">0</b></div>
+
+    <div class="box">
+      Inicio
+      <b id="inicioTotal">0</b>
+    </div>
+
+    <div class="box">
+      Vendido
+      <b class="verde" id="vendidoTotal">0</b>
+    </div>
+
+    <div class="box">
+      Final
+      <b class="morado" id="finalTotal">0</b>
+    </div>
+
   </div>
 
   <div id="lista"></div>
 
   <div class="formulario">
+
     <h2>+ Agregar producto</h2>
 
     <input id="nombre" placeholder="Nombre del producto">
-    <input id="cantidad" type="number" placeholder="Cantidad inicial">
-    <input id="costo" type="number" placeholder="Cuánto costó">
-    <input id="venta" type="number" placeholder="Cuánto se vende">
-    <input id="comision" type="number" placeholder="Comisión que da">
 
-    <button onclick="agregarProducto()">Agregar producto</button>
+    <input
+      id="cantidad"
+      type="number"
+      placeholder="Cantidad inicial"
+    >
+
+    <input
+      id="costo"
+      type="number"
+      placeholder="Cuánto costó"
+    >
+
+    <input
+      id="venta"
+      type="number"
+      placeholder="Cuánto se vende"
+    >
+
+    <input
+      id="comision"
+      type="number"
+      placeholder="Comisión que da"
+    >
+
+    <button onclick="agregarProducto()">
+      Agregar producto
+    </button>
+
   </div>
 
   <div class="formulario">
     <h2>📝 Notas del día</h2>
-    <textarea id="notas" placeholder="Notas..."></textarea>
+
+    <textarea
+      id="notas"
+      placeholder="Notas..."
+    ></textarea>
   </div>
 
 </div>
 
-<button id="btnCerrar" class="cerrar oculto" onclick="cerrarDia()">🌙 Cerrar día</button>
+<button
+  id="btnCerrar"
+  class="cerrar oculto"
+  onclick="cerrarDia()"
+>
+  🌙 Cerrar día
+</button>
 
 <script>
-const SUPABASE_URL = "https://nbeztoulibouaiwhkkzx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_rBfUEuSG0oN__EW38QL68w_1rJ-deQp";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+"https://nbeztoulibouaiwhkkzx.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_rBfUEuSG0oN__EW38QL68w_1rJ-deQp";
+
+const db =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
 let productos = [];
 let registroId = null;
 
-const fechaInput = document.getElementById("fechaManual");
+const fechaInput =
+document.getElementById("fechaManual");
 
 function hoy(){
-  return new Date().toISOString().split("T")[0];
+  return new Date()
+    .toISOString()
+    .split("T")[0];
 }
 
 fechaInput.value = hoy();
 
 function textoFecha(){
-  const p = fechaInput.value.split("-");
-  const f = new Date(p[0], p[1]-1, p[2]);
 
-  return f.toLocaleDateString("es-MX",{
-    weekday:"long",
-    year:"numeric",
-    month:"long",
-    day:"numeric"
-  });
+  const p =
+    fechaInput.value.split("-");
+
+  const f =
+    new Date(p[0], p[1]-1, p[2]);
+
+  return f.toLocaleDateString(
+    "es-MX",
+    {
+      weekday:"long",
+      year:"numeric",
+      month:"long",
+      day:"numeric"
+    }
+  );
 }
 
-async function login(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+async function iniciarSesion(){
 
-  const { error } = await db.auth.signInWithPassword({
-    email,
-    password
-  });
+  const email =
+    document.getElementById("email")
+    .value
+    .trim();
+
+  const password =
+    document.getElementById("password")
+    .value
+    .trim();
+
+  const { error } =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
 
   if(error){
-    document.getElementById("error").innerText =
-      "Correo o contraseña incorrectos";
+
+    document.getElementById("error")
+    .innerText =
+    "Correo o contraseña incorrectos";
+
     return;
   }
 
@@ -256,7 +355,9 @@ async function logout(){
 }
 
 async function revisarSesion(){
-  const { data } = await db.auth.getSession();
+
+  const { data } =
+    await db.auth.getSession();
 
   if(data.session){
     mostrarApp();
@@ -264,61 +365,101 @@ async function revisarSesion(){
 }
 
 async function mostrarApp(){
-  document.getElementById("login").classList.add("oculto");
-  document.getElementById("app").classList.remove("oculto");
-  document.getElementById("btnCerrar").classList.remove("oculto");
+
+  document
+  .getElementById("loginBox")
+  .classList.add("oculto");
+
+  document
+  .getElementById("app")
+  .classList.remove("oculto");
+
+  document
+  .getElementById("btnCerrar")
+  .classList.remove("oculto");
 
   await cargarInventario();
 }
 
 async function cargarInventario(){
-  document.getElementById("fechaTexto").innerText = textoFecha();
+
+  document
+  .getElementById("fechaTexto")
+  .innerText = textoFecha();
 
   registroId = null;
   productos = [];
-  document.getElementById("notas").value = "";
 
-  let { data, error } = await db
+  document
+  .getElementById("notas")
+  .value = "";
+
+  let { data, error } =
+    await db
     .from("inventario")
     .select("*")
     .eq("Fecha", fechaInput.value)
     .limit(1);
 
   if(error){
-    alert("Error al cargar: " + error.message);
+    alert(
+      "Error al cargar: " +
+      error.message
+    );
     return;
   }
 
   if(data && data.length > 0){
+
     registroId = data[0].id;
-    const guardado = data[0].Data || {};
-    productos = guardado.productos || [];
-    document.getElementById("notas").value = guardado.notas || "";
+
+    const guardado =
+      data[0].Data || {};
+
+    productos =
+      guardado.productos || [];
+
+    document
+    .getElementById("notas")
+    .value =
+      guardado.notas || "";
   }
 
   mostrar();
 }
 
 async function guardarInventario(){
+
   const datos = {
-    productos: productos,
-    notas: document.getElementById("notas").value,
-    actualizado: new Date().toISOString()
+    productos,
+    notas:
+      document
+      .getElementById("notas")
+      .value,
+
+    actualizado:
+      new Date().toISOString()
   };
 
   if(registroId){
-    const { error } = await db
+
+    const { error } =
+      await db
       .from("inventario")
       .update({ Data: datos })
       .eq("id", registroId);
 
     if(error){
-      alert("Error al guardar: " + error.message);
+      alert(
+        "Error al guardar: " +
+        error.message
+      );
     }
 
   }else{
 
-    const { data, error } = await db
+    const { data, error } =
+      await db
       .from("inventario")
       .insert([
         {
@@ -330,7 +471,10 @@ async function guardarInventario(){
       .single();
 
     if(error){
-      alert("Error al crear día: " + error.message);
+      alert(
+        "Error al crear día: " +
+        error.message
+      );
       return;
     }
 
@@ -339,11 +483,40 @@ async function guardarInventario(){
 }
 
 async function agregarProducto(){
-  const nombre = document.getElementById("nombre").value.trim();
-  const cantidad = parseInt(document.getElementById("cantidad").value);
-  const costo = parseFloat(document.getElementById("costo").value) || 0;
-  const venta = parseFloat(document.getElementById("venta").value) || 0;
-  const comision = parseFloat(document.getElementById("comision").value) || 0;
+
+  const nombre =
+    document
+    .getElementById("nombre")
+    .value
+    .trim();
+
+  const cantidad =
+    parseInt(
+      document
+      .getElementById("cantidad")
+      .value
+    );
+
+  const costo =
+    parseFloat(
+      document
+      .getElementById("costo")
+      .value
+    ) || 0;
+
+  const venta =
+    parseFloat(
+      document
+      .getElementById("venta")
+      .value
+    ) || 0;
+
+  const comision =
+    parseFloat(
+      document
+      .getElementById("comision")
+      .value
+    ) || 0;
 
   if(!nombre || isNaN(cantidad)){
     alert("Escribe producto y cantidad");
@@ -359,89 +532,151 @@ async function agregarProducto(){
     comision
   });
 
-  document.getElementById("nombre").value = "";
-  document.getElementById("cantidad").value = "";
-  document.getElementById("costo").value = "";
-  document.getElementById("venta").value = "";
-  document.getElementById("comision").value = "";
+  document.getElementById("nombre").value="";
+  document.getElementById("cantidad").value="";
+  document.getElementById("costo").value="";
+  document.getElementById("venta").value="";
+  document.getElementById("comision").value="";
 
   await guardarInventario();
+
   mostrar();
 }
 
 async function vender(i){
-  if(productos[i].vendido < productos[i].inicio){
+
+  if(productos[i].vendido <
+     productos[i].inicio){
+
     productos[i].vendido++;
+
     await guardarInventario();
+
     mostrar();
   }
 }
 
 async function regresar(i){
+
   if(productos[i].vendido > 0){
+
     productos[i].vendido--;
+
     await guardarInventario();
+
     mostrar();
   }
 }
 
 async function agregarMercancia(i){
-  const cantidad = parseInt(
-    prompt("¿Cuánta mercancía llegó?")
-  );
 
-  if(isNaN(cantidad) || cantidad <= 0){
+  const cantidad =
+    parseInt(
+      prompt(
+        "¿Cuánta mercancía llegó?"
+      )
+    );
+
+  if(isNaN(cantidad) ||
+     cantidad <= 0){
     return;
   }
 
   productos[i].inicio += cantidad;
 
   await guardarInventario();
+
   mostrar();
 }
 
 async function editarProducto(i){
+
   const p = productos[i];
 
-  const nuevoNombre = prompt("Nombre del producto:", p.nombre);
+  const nuevoNombre =
+    prompt(
+      "Nombre del producto:",
+      p.nombre
+    );
+
   if(nuevoNombre === null) return;
 
-  const nuevoInicio = prompt("Cantidad inicio:", p.inicio);
+  const nuevoInicio =
+    prompt(
+      "Cantidad inicio:",
+      p.inicio
+    );
+
   if(nuevoInicio === null) return;
 
-  const nuevoCosto = prompt("Cuánto costó:", p.costo || 0);
+  const nuevoCosto =
+    prompt(
+      "Cuánto costó:",
+      p.costo || 0
+    );
+
   if(nuevoCosto === null) return;
 
-  const nuevaVenta = prompt("Cuánto se vende:", p.venta || 0);
+  const nuevaVenta =
+    prompt(
+      "Cuánto se vende:",
+      p.venta || 0
+    );
+
   if(nuevaVenta === null) return;
 
-  const nuevaComision = prompt("Comisión:", p.comision || 0);
+  const nuevaComision =
+    prompt(
+      "Comisión:",
+      p.comision || 0
+    );
+
   if(nuevaComision === null) return;
 
-  productos[i].nombre = nuevoNombre.trim() || p.nombre;
-  productos[i].inicio = parseInt(nuevoInicio) || 0;
-  productos[i].costo = parseFloat(nuevoCosto) || 0;
-  productos[i].venta = parseFloat(nuevaVenta) || 0;
-  productos[i].comision = parseFloat(nuevaComision) || 0;
+  productos[i].nombre =
+    nuevoNombre.trim() || p.nombre;
 
-  if(productos[i].vendido > productos[i].inicio){
-    productos[i].vendido = productos[i].inicio;
+  productos[i].inicio =
+    parseInt(nuevoInicio) || 0;
+
+  productos[i].costo =
+    parseFloat(nuevoCosto) || 0;
+
+  productos[i].venta =
+    parseFloat(nuevaVenta) || 0;
+
+  productos[i].comision =
+    parseFloat(nuevaComision) || 0;
+
+  if(productos[i].vendido >
+     productos[i].inicio){
+
+    productos[i].vendido =
+      productos[i].inicio;
   }
 
   await guardarInventario();
+
   mostrar();
 }
 
 async function borrar(i){
+
   if(confirm("¿Borrar producto?")){
+
     productos.splice(i,1);
+
     await guardarInventario();
+
     mostrar();
   }
 }
 
 function mostrar(){
-  let lista = document.getElementById("lista");
+
+  let lista =
+    document.getElementById("lista");
+
   lista.innerHTML = "";
 
   let inicioTotal = 0;
@@ -450,11 +685,17 @@ function mostrar(){
 
   productos.forEach((p,i)=>{
 
-    if(p.costo === undefined) p.costo = 0;
-    if(p.venta === undefined) p.venta = 0;
-    if(p.comision === undefined) p.comision = 0;
+    if(p.costo === undefined)
+      p.costo = 0;
 
-    let final = p.inicio - p.vendido;
+    if(p.venta === undefined)
+      p.venta = 0;
+
+    if(p.comision === undefined)
+      p.comision = 0;
+
+    let final =
+      p.inicio - p.vendido;
 
     inicioTotal += p.inicio;
     vendidoTotal += p.vendido;
@@ -463,7 +704,10 @@ function mostrar(){
     lista.innerHTML += `
       <div class="card">
 
-        <button class="btn-borrar" onclick="borrar(${i})">
+        <button
+          class="btn-borrar"
+          onclick="borrar(${i})"
+        >
           🗑️
         </button>
 
@@ -473,19 +717,39 @@ function mostrar(){
 
           <div>
             Inicio
-            <div class="num">${p.inicio}</div>
+            <div class="num">
+              ${p.inicio}
+            </div>
           </div>
 
           <div>
             Vendido<br>
-            <button class="btn-mini btn-menos" onclick="regresar(${i})">−</button>
-            <span class="num verde">${p.vendido}</span>
-            <button class="btn-mini" onclick="vender(${i})">+</button>
+
+            <button
+              class="btn-mini btn-menos"
+              onclick="regresar(${i})"
+            >
+              −
+            </button>
+
+            <span class="num verde">
+              ${p.vendido}
+            </span>
+
+            <button
+              class="btn-mini"
+              onclick="vender(${i})"
+            >
+              +
+            </button>
+
           </div>
 
           <div>
             Final
-            <div class="num morado">${final}</div>
+            <div class="num morado">
+              ${final}
+            </div>
           </div>
 
         </div>
@@ -496,11 +760,17 @@ function mostrar(){
           Comisión: $${p.comision}
         </div>
 
-        <button class="btn-mercancia" onclick="agregarMercancia(${i})">
+        <button
+          class="btn-mercancia"
+          onclick="agregarMercancia(${i})"
+        >
           ➕ Agregar mercancía
         </button>
 
-        <button class="btn-editar" onclick="editarProducto(${i})">
+        <button
+          class="btn-editar"
+          onclick="editarProducto(${i})"
+        >
           ✏️ Editar producto
         </button>
 
@@ -508,31 +778,57 @@ function mostrar(){
     `;
   });
 
-  document.getElementById("inicioTotal").innerText = inicioTotal;
-  document.getElementById("vendidoTotal").innerText = vendidoTotal;
-  document.getElementById("finalTotal").innerText = finalTotal;
+  document
+  .getElementById("inicioTotal")
+  .innerText = inicioTotal;
+
+  document
+  .getElementById("vendidoTotal")
+  .innerText = vendidoTotal;
+
+  document
+  .getElementById("finalTotal")
+  .innerText = finalTotal;
 }
 
-document.getElementById("notas").addEventListener("input", guardarInventario);
+document
+.getElementById("notas")
+.addEventListener(
+  "input",
+  guardarInventario
+);
 
 async function cerrarDia(){
+
   if(!confirm("¿Cerrar este día?")){
     return;
   }
 
-  productos = productos.map(p=>({
-    nombre:p.nombre,
-    inicio:p.inicio - p.vendido,
-    vendido:0,
-    costo:p.costo || 0,
-    venta:p.venta || 0,
-    comision:p.comision || 0
-  })).filter(p=>p.inicio > 0);
+  productos =
+    productos
+    .map(p=>({
+
+      nombre:p.nombre,
+
+      inicio:
+        p.inicio - p.vendido,
+
+      vendido:0,
+
+      costo:p.costo || 0,
+      venta:p.venta || 0,
+      comision:p.comision || 0
+
+    }))
+    .filter(p=>p.inicio > 0);
 
   await guardarInventario();
+
   mostrar();
 
-  alert("Día cerrado y guardado en internet");
+  alert(
+    "Día cerrado y guardado en internet"
+  );
 }
 
 revisarSesion();
