@@ -8,9 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -27,9 +25,7 @@ header{
   font-weight:bold;
 }
 
-.container{
-  padding:18px;
-}
+.container{padding:18px}
 
 .login{
   max-width:420px;
@@ -58,9 +54,7 @@ button{
   width:100%;
 }
 
-.formulario,
-.card,
-.box{
+.formulario,.card,.box{
   background:#111827;
   border:1px solid #263247;
   border-radius:20px;
@@ -74,28 +68,22 @@ button{
   gap:10px;
 }
 
-.box{
-  text-align:center;
-}
+.box{text-align:center}
 
 .box b{
   font-size:30px;
   display:block;
 }
 
-.verde{
-  color:#31d079;
-}
-
-.morado{
-  color:#9b5cff;
-}
+.verde{color:#31d079}
+.morado{color:#9b5cff}
 
 .fila{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   text-align:center;
   align-items:center;
+  gap:8px;
 }
 
 .num{
@@ -110,24 +98,10 @@ button{
   margin:4px;
 }
 
-.btn-menos{
-  background:#1b2233;
-}
-
-.btn-editar{
-  background:#2563eb;
-  margin-top:10px;
-}
-
-.btn-mercancia{
-  background:#16a34a;
-  margin-top:10px;
-}
-
-.btn-borrar{
-  background:#222;
-  margin-bottom:10px;
-}
+.btn-menos{background:#1b2233}
+.btn-guardar{background:#16a34a;margin-top:10px}
+.btn-danada{background:#dc2626;margin-top:10px}
+.btn-borrar{background:#222;margin-bottom:10px}
 
 .info{
   background:#0b1222;
@@ -135,6 +109,12 @@ button{
   border-radius:12px;
   margin-top:12px;
   line-height:1.5;
+}
+
+.info label{
+  display:block;
+  margin-top:8px;
+  font-weight:bold;
 }
 
 .cerrar{
@@ -147,9 +127,7 @@ button{
   font-weight:bold;
 }
 
-.oculto{
-  display:none;
-}
+.oculto{display:none}
 
 .error{
   color:#ff8080;
@@ -160,238 +138,111 @@ button{
 
 <body>
 
-<header>
-📦 InventApp
-</header>
+<header>📦 InventApp</header>
 
 <div id="loginBox" class="login">
-
   <h2>Entrar al inventario</h2>
 
-  <input
-    id="email"
-    type="email"
-    value="htolosarodriguez@gmail.com"
-    placeholder="Correo"
-  >
+  <input id="email" type="email" value="htolosarodriguez@gmail.com" placeholder="Correo">
 
   <div style="position:relative">
+    <input id="password" type="password" placeholder="Contraseña" style="padding-right:60px">
 
-    <input
-      id="password"
-      type="password"
-      placeholder="Contraseña"
-      style="padding-right:60px"
-    >
-
-    <button
-      type="button"
-      onclick="verPassword()"
-      style="
-        position:absolute;
-        right:8px;
-        top:8px;
-        width:auto;
-        padding:10px;
-        background:#222;
-        font-size:16px;
-      "
-    >
-      👁️
-    </button>
-
+    <button type="button" onclick="verPassword()" style="
+      position:absolute;
+      right:8px;
+      top:8px;
+      width:auto;
+      padding:10px;
+      background:#222;
+      font-size:16px;
+    ">👁️</button>
   </div>
 
-  <button
-    type="button"
-    onclick="iniciarSesion()"
-  >
-    Entrar
-  </button>
+  <button type="button" onclick="iniciarSesion()">Entrar</button>
 
   <div id="error" class="error"></div>
-
 </div>
 
 <div id="app" class="container oculto">
 
-  <button onclick="logout()">
-    Cerrar sesión
-  </button>
+  <button onclick="logout()">Cerrar sesión</button>
 
   <h1 id="fechaTexto"></h1>
 
-  <input
-    id="fechaManual"
-    type="date"
-    onchange="cargarInventario()"
-  >
+  <input id="fechaManual" type="date" onchange="cargarInventario()">
 
   <div class="totales">
-
-    <div class="box">
-      Inicio
-      <b id="inicioTotal">0</b>
-    </div>
-
-    <div class="box">
-      Vendido
-      <b class="verde" id="vendidoTotal">0</b>
-    </div>
-
-    <div class="box">
-      Final
-      <b class="morado" id="finalTotal">0</b>
-    </div>
-
+    <div class="box">Inicio<b id="inicioTotal">0</b></div>
+    <div class="box">Vendido<b class="verde" id="vendidoTotal">0</b></div>
+    <div class="box">Final<b class="morado" id="finalTotal">0</b></div>
   </div>
 
   <div id="lista"></div>
 
   <div class="formulario">
-
     <h2>+ Agregar producto</h2>
 
-    <input
-      id="nombre"
-      placeholder="Nombre del producto"
-    >
+    <input id="nombre" placeholder="Nombre del producto">
+    <input id="cantidad" type="number" placeholder="Cantidad inicial">
+    <input id="costo" type="number" placeholder="Cuánto costó">
+    <input id="venta" type="number" placeholder="Cuánto se vende">
+    <input id="comision" type="number" placeholder="Comisión">
 
-    <input
-      id="cantidad"
-      type="number"
-      placeholder="Cantidad inicial"
-    >
-
-    <input
-      id="costo"
-      type="number"
-      placeholder="Cuánto costó"
-    >
-
-    <input
-      id="venta"
-      type="number"
-      placeholder="Cuánto se vende"
-    >
-
-    <input
-      id="comision"
-      type="number"
-      placeholder="Comisión"
-    >
-
-    <button onclick="agregarProducto()">
-      Agregar producto
-    </button>
-
+    <button onclick="agregarProducto()">Agregar producto</button>
   </div>
 
   <div class="formulario">
-
     <h2>📝 Notas del día</h2>
-
-    <textarea
-      id="notas"
-      placeholder="Notas..."
-    ></textarea>
-
+    <textarea id="notas" placeholder="Notas..."></textarea>
   </div>
 
 </div>
 
-<button
-  id="btnCerrar"
-  class="cerrar oculto"
-  onclick="cerrarDia()"
->
-🌙 Cerrar día
-</button>
+<button id="btnCerrar" class="cerrar oculto" onclick="cerrarDia()">🌙 Cerrar día</button>
 
 <script>
+const SUPABASE_URL = "https://nbeztoulibouaiwhkkzx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_rBfUEuSG0oN__EW38QL68w_1rJ-deQp";
 
-const SUPABASE_URL =
-"https://nbeztoulibouaiwhkkzx.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_rBfUEuSG0oN__EW38QL68w_1rJ-deQp";
-
-const db =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let productos = [];
 let registroId = null;
 
-const fechaInput =
-document.getElementById("fechaManual");
+const fechaInput = document.getElementById("fechaManual");
 
 function hoy(){
-  return new Date()
-  .toISOString()
-  .split("T")[0];
+  return new Date().toISOString().split("T")[0];
 }
 
 fechaInput.value = hoy();
 
 function verPassword(){
-
-  const pass =
-    document.getElementById("password");
-
-  if(pass.type === "password"){
-    pass.type = "text";
-  }else{
-    pass.type = "password";
-  }
+  const pass = document.getElementById("password");
+  pass.type = pass.type === "password" ? "text" : "password";
 }
 
 function textoFecha(){
+  const p = fechaInput.value.split("-");
+  const f = new Date(p[0], p[1]-1, p[2]);
 
-  const p =
-    fechaInput.value.split("-");
-
-  const f =
-    new Date(p[0], p[1]-1, p[2]);
-
-  return f.toLocaleDateString(
-    "es-MX",
-    {
-      weekday:"long",
-      year:"numeric",
-      month:"long",
-      day:"numeric"
-    }
-  );
+  return f.toLocaleDateString("es-MX",{
+    weekday:"long",
+    year:"numeric",
+    month:"long",
+    day:"numeric"
+  });
 }
 
 async function iniciarSesion(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-  const email =
-    document.getElementById("email")
-    .value
-    .trim();
-
-  const password =
-    document.getElementById("password")
-    .value
-    .trim();
-
-  const { error } =
-    await db.auth.signInWithPassword({
-      email,
-      password
-    });
+  const { error } = await db.auth.signInWithPassword({ email, password });
 
   if(error){
-
-    document
-    .getElementById("error")
-    .innerText =
-    "Correo o contraseña incorrectos";
-
+    document.getElementById("error").innerText = "Correo o contraseña incorrectos";
     return;
   }
 
@@ -404,141 +255,87 @@ async function logout(){
 }
 
 async function revisarSesion(){
-
-  const { data } =
-    await db.auth.getSession();
-
+  const { data } = await db.auth.getSession();
   if(data.session){
     mostrarApp();
   }
 }
 
 async function mostrarApp(){
-
-  document
-  .getElementById("loginBox")
-  .classList.add("oculto");
-
-  document
-  .getElementById("app")
-  .classList.remove("oculto");
-
-  document
-  .getElementById("btnCerrar")
-  .classList.remove("oculto");
+  document.getElementById("loginBox").classList.add("oculto");
+  document.getElementById("app").classList.remove("oculto");
+  document.getElementById("btnCerrar").classList.remove("oculto");
 
   await cargarInventario();
 }
 
 async function cargarInventario(){
-
-  document
-  .getElementById("fechaTexto")
-  .innerText = textoFecha();
+  document.getElementById("fechaTexto").innerText = textoFecha();
 
   registroId = null;
   productos = [];
+  document.getElementById("notas").value = "";
 
-  document
-  .getElementById("notas")
-  .value = "";
-
-  let { data } =
-    await db
+  let { data, error } = await db
     .from("inventario")
     .select("*")
     .eq("Fecha", fechaInput.value)
     .limit(1);
 
+  if(error){
+    alert("Error al cargar: " + error.message);
+    return;
+  }
+
   if(data && data.length > 0){
-
     registroId = data[0].id;
-
-    const guardado =
-      data[0].Data || {};
-
-    productos =
-      guardado.productos || [];
-
-    document
-    .getElementById("notas")
-    .value =
-      guardado.notas || "";
+    const guardado = data[0].Data || {};
+    productos = guardado.productos || [];
+    document.getElementById("notas").value = guardado.notas || "";
   }
 
   mostrar();
 }
 
 async function guardarInventario(){
-
   const datos = {
     productos,
-    notas:
-      document
-      .getElementById("notas")
-      .value
+    notas: document.getElementById("notas").value,
+    actualizado: new Date().toISOString()
   };
 
   if(registroId){
+    const { error } = await db
+      .from("inventario")
+      .update({ Data: datos })
+      .eq("id", registroId);
 
-    await db
-    .from("inventario")
-    .update({ Data: datos })
-    .eq("id", registroId);
+    if(error){
+      alert("Error al guardar: " + error.message);
+    }
 
   }else{
-
-    const { data } =
-      await db
+    const { data, error } = await db
       .from("inventario")
-      .insert([
-        {
-          Fecha: fechaInput.value,
-          Data: datos
-        }
-      ])
+      .insert([{ Fecha: fechaInput.value, Data: datos }])
       .select()
       .single();
+
+    if(error){
+      alert("Error al crear día: " + error.message);
+      return;
+    }
 
     registroId = data.id;
   }
 }
 
 async function agregarProducto(){
-
-  const nombre =
-    document
-    .getElementById("nombre")
-    .value
-    .trim();
-
-  const cantidad =
-    parseInt(
-      document
-      .getElementById("cantidad")
-      .value
-    );
-
-  const costo =
-    parseFloat(
-      document
-      .getElementById("costo")
-      .value
-    ) || 0;
-
-  const venta =
-    parseFloat(
-      document
-      .getElementById("venta")
-      .value
-    ) || 0;
-
-  const comision =
-    parseFloat(
-      document
-      .getElementById("comision")
-      .value
-    ) || 0;
+  const nombre = document.getElementById("nombre").value.trim();
+  const cantidad = parseInt(document.getElementById("cantidad").value);
+  const costo = parseFloat(document.getElementById("costo").value) || 0;
+  const venta = parseFloat(document.getElementById("venta").value) || 0;
+  const comision = parseFloat(document.getElementById("comision").value) || 0;
 
   if(!nombre || isNaN(cantidad)){
     alert("Escribe producto y cantidad");
@@ -554,111 +351,89 @@ async function agregarProducto(){
     comision
   });
 
-  document.getElementById("nombre").value="";
-  document.getElementById("cantidad").value="";
-  document.getElementById("costo").value="";
-  document.getElementById("venta").value="";
-  document.getElementById("comision").value="";
+  document.getElementById("nombre").value = "";
+  document.getElementById("cantidad").value = "";
+  document.getElementById("costo").value = "";
+  document.getElementById("venta").value = "";
+  document.getElementById("comision").value = "";
 
   await guardarInventario();
-
   mostrar();
 }
 
 async function vender(i){
-
-  if(productos[i].vendido <
-     productos[i].inicio){
-
+  if(productos[i].vendido < productos[i].inicio){
     productos[i].vendido++;
-
     await guardarInventario();
-
     mostrar();
   }
 }
 
 async function regresar(i){
-
   if(productos[i].vendido > 0){
-
     productos[i].vendido--;
-
     await guardarInventario();
-
     mostrar();
   }
 }
 
-async function agregarMercancia(i){
+async function guardarCambios(i){
+  const inicio = parseInt(document.getElementById("inicio_" + i).value);
+  const costo = parseFloat(document.getElementById("costo_" + i).value) || 0;
+  const venta = parseFloat(document.getElementById("venta_" + i).value) || 0;
+  const comision = parseFloat(document.getElementById("comision_" + i).value) || 0;
 
-  const cantidad =
-    parseInt(
-      prompt(
-        "¿Cuánta mercancía llegó?"
-      )
-    );
-
-  if(isNaN(cantidad) ||
-     cantidad <= 0){
+  if(isNaN(inicio) || inicio < 0){
+    alert("Cantidad inicio incorrecta");
     return;
   }
 
-  productos[i].inicio += cantidad;
+  if(inicio < productos[i].vendido){
+    alert("Inicio no puede ser menor que vendido");
+    return;
+  }
+
+  productos[i].inicio = inicio;
+  productos[i].costo = costo;
+  productos[i].venta = venta;
+  productos[i].comision = comision;
 
   await guardarInventario();
-
   mostrar();
+
+  alert("Cambios guardados");
 }
 
-async function editarProducto(i){
+async function quitarDanada(i){
+  const cantidad = parseInt(prompt("¿Cuántas piezas dañadas quieres quitar?"));
 
-  const p = productos[i];
+  if(isNaN(cantidad) || cantidad <= 0){
+    return;
+  }
 
-  const nuevoNombre =
-    prompt(
-      "Nombre:",
-      p.nombre
-    );
+  const nuevoInicio = productos[i].inicio - cantidad;
 
-  if(nuevoNombre === null) return;
+  if(nuevoInicio < productos[i].vendido){
+    alert("No puedes quitar más de lo disponible");
+    return;
+  }
 
-  const nuevoInicio =
-    prompt(
-      "Cantidad:",
-      p.inicio
-    );
-
-  if(nuevoInicio === null) return;
-
-  productos[i].nombre =
-    nuevoNombre;
-
-  productos[i].inicio =
-    parseInt(nuevoInicio) || 0;
+  productos[i].inicio = nuevoInicio;
 
   await guardarInventario();
-
   mostrar();
 }
 
 async function borrar(i){
-
-  if(confirm("¿Borrar producto?")){
-
+  if(confirm("¿Borrar producto completo?")){
     productos.splice(i,1);
-
     await guardarInventario();
-
     mostrar();
   }
 }
 
 function mostrar(){
-
-  let lista =
-    document.getElementById("lista");
-
+  let lista = document.getElementById("lista");
   lista.innerHTML = "";
 
   let inicioTotal = 0;
@@ -666,9 +441,11 @@ function mostrar(){
   let finalTotal = 0;
 
   productos.forEach((p,i)=>{
+    if(p.costo === undefined) p.costo = 0;
+    if(p.venta === undefined) p.venta = 0;
+    if(p.comision === undefined) p.comision = 0;
 
-    let final =
-      p.inicio - p.vendido;
+    let final = p.inicio - p.vendido;
 
     inicioTotal += p.inicio;
     vendidoTotal += p.vendido;
@@ -677,136 +454,85 @@ function mostrar(){
     lista.innerHTML += `
       <div class="card">
 
-        <button
-          class="btn-borrar"
-          onclick="borrar(${i})"
-        >
-          🗑️
+        <button class="btn-borrar" onclick="borrar(${i})">
+          🗑️ Borrar producto
         </button>
 
         <h2>${p.nombre}</h2>
 
         <div class="fila">
-
           <div>
             Inicio
-            <div class="num">
-              ${p.inicio}
-            </div>
+            <div class="num">${p.inicio}</div>
           </div>
 
           <div>
-
             Vendido<br>
-
-            <button
-              class="btn-mini btn-menos"
-              onclick="regresar(${i})"
-            >
-              −
-            </button>
-
-            <span class="num verde">
-              ${p.vendido}
-            </span>
-
-            <button
-              class="btn-mini"
-              onclick="vender(${i})"
-            >
-              +
-            </button>
-
+            <button class="btn-mini btn-menos" onclick="regresar(${i})">−</button>
+            <span class="num verde">${p.vendido}</span>
+            <button class="btn-mini" onclick="vender(${i})">+</button>
           </div>
 
           <div>
             Final
-            <div class="num morado">
-              ${final}
-            </div>
+            <div class="num morado">${final}</div>
           </div>
-
         </div>
 
         <div class="info">
-          Costo: $${p.costo}<br>
-          Venta: $${p.venta}<br>
-          Comisión: $${p.comision}
+          <label>Editar inicio</label>
+          <input id="inicio_${i}" type="number" value="${p.inicio}">
+
+          <label>Costo</label>
+          <input id="costo_${i}" type="number" value="${p.costo}">
+
+          <label>Venta</label>
+          <input id="venta_${i}" type="number" value="${p.venta}">
+
+          <label>Comisión</label>
+          <input id="comision_${i}" type="number" value="${p.comision}">
         </div>
 
-        <button
-          class="btn-mercancia"
-          onclick="agregarMercancia(${i})"
-        >
-          ➕ Agregar mercancía
+        <button class="btn-guardar" onclick="guardarCambios(${i})">
+          💾 Guardar cambios
         </button>
 
-        <button
-          class="btn-editar"
-          onclick="editarProducto(${i})"
-        >
-          ✏️ Editar producto
+        <button class="btn-danada" onclick="quitarDanada(${i})">
+          ❌ Quitar mercancía dañada
         </button>
 
       </div>
     `;
   });
 
-  document
-  .getElementById("inicioTotal")
-  .innerText = inicioTotal;
-
-  document
-  .getElementById("vendidoTotal")
-  .innerText = vendidoTotal;
-
-  document
-  .getElementById("finalTotal")
-  .innerText = finalTotal;
+  document.getElementById("inicioTotal").innerText = inicioTotal;
+  document.getElementById("vendidoTotal").innerText = vendidoTotal;
+  document.getElementById("finalTotal").innerText = finalTotal;
 }
 
-document
-.getElementById("notas")
-.addEventListener(
-  "input",
-  guardarInventario
-);
+document.getElementById("notas").addEventListener("input", guardarInventario);
 
 async function cerrarDia(){
-
   if(!confirm("¿Cerrar este día?")){
     return;
   }
 
-  productos =
-    productos
-    .map(p=>({
-
-      nombre:p.nombre,
-
-      inicio:
-        p.inicio - p.vendido,
-
-      vendido:0,
-
-      costo:p.costo,
-      venta:p.venta,
-      comision:p.comision
-
-    }))
-    .filter(p=>p.inicio > 0);
+  productos = productos.map(p=>({
+    nombre:p.nombre,
+    inicio:p.inicio - p.vendido,
+    vendido:0,
+    costo:p.costo || 0,
+    venta:p.venta || 0,
+    comision:p.comision || 0
+  })).filter(p=>p.inicio > 0);
 
   await guardarInventario();
-
   mostrar();
 
-  alert(
-    "Día cerrado y guardado"
-  );
+  alert("Día cerrado y guardado");
 }
 
 revisarSesion();
-
 </script>
 
 </body>
