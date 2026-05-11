@@ -547,7 +547,26 @@ async function cerrarDia(){
     vendido:0,
     costo:p.costo || 0,
     venta:p.venta || 0
-  })).filter(p=>p.inicio > 0);
+  }));
+
+  const partes = fechaInput.value.split("-");
+  const fecha = new Date(p[0], p[1] - 1, p[2]);
+}
+
+async function cerrarDia(){
+  if(!confirm("¿Cerrar este día?")){
+    return;
+  }
+
+  await guardarInventario();
+
+  const productosSiguienteDia = productos.map(p=>({
+    nombre:p.nombre,
+    inicio:p.inicio - p.vendido,
+    vendido:0,
+    costo:p.costo || 0,
+    venta:p.venta || 0
+  }));
 
   const partes = fechaInput.value.split("-");
   const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
@@ -559,19 +578,49 @@ async function cerrarDia(){
     String(fecha.getMonth() + 1).padStart(2, "0") + "-" +
     String(fecha.getDate()).padStart(2, "0");
 
+  const datosSiguienteDia = {
+    productos: productosSiguienteDia,
+    notas: "",
+    actualizado: new Date().toISOString()
+  };
+
+  let { data: diaExistente, error: errorBuscar } = await db
+    .from("inventario")
+    .select("*")
+    .eq("Fecha", siguienteDia)
+    .limit(1);
+
+  if(errorBuscar){
+    alert("Error al buscar el siguiente día: " + errorBuscar.message);
+    return;
+  }
+
+  if(diaExistente && diaExistente.length > 0){
+    const { error } = await db
+      .from("inventario")
+      .update({ Data: datosSiguienteDia })
+      .eq("id", diaExistente[0].id);
+
+    if(error){
+      alert("Error al actualizar siguiente día: " + error.message);
+      return;
+    }
+  }else{
+    const { error } = await db
+      .from("inventario")
+      .insert([{ Fecha: siguienteDia, Data: datosSiguienteDia }]);
+
+    if(error){
+      alert("Error al crear siguiente día: " + error.message);
+      return;
+    }
+  }
+
   fechaInput.value = siguienteDia;
-
-  registroId = null;
-
-  productos = productosSiguienteDia;
-
-  document.getElementById("notas").value = "";
-
-  await guardarInventario();
 
   await cargarInventario();
 
-  alert("Día cerrado. Ya brincó al siguiente día.");
+  alert("Día cerrado. Todos los datos pasaron al siguiente día.");
 }
 
 revisarSesion();
