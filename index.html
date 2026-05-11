@@ -539,7 +539,9 @@ async function cerrarDia(){
     return;
   }
 
-  productos = productos.map(p=>({
+  await guardarInventario();
+
+  const productosSiguienteDia = productos.map(p=>({
     nombre:p.nombre,
     inicio:p.inicio - p.vendido,
     vendido:0,
@@ -547,10 +549,29 @@ async function cerrarDia(){
     venta:p.venta || 0
   })).filter(p=>p.inicio > 0);
 
-  await guardarInventario();
-  mostrar();
+  const partes = fechaInput.value.split("-");
+  const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
 
-  alert("Día cerrado y guardado");
+  fecha.setDate(fecha.getDate() + 1);
+
+  const siguienteDia =
+    fecha.getFullYear() + "-" +
+    String(fecha.getMonth() + 1).padStart(2, "0") + "-" +
+    String(fecha.getDate()).padStart(2, "0");
+
+  fechaInput.value = siguienteDia;
+
+  registroId = null;
+
+  productos = productosSiguienteDia;
+
+  document.getElementById("notas").value = "";
+
+  await guardarInventario();
+
+  await cargarInventario();
+
+  alert("Día cerrado. Ya brincó al siguiente día.");
 }
 
 revisarSesion();
