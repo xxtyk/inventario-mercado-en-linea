@@ -424,7 +424,6 @@ async function cargarInventario(){
   .innerText = textoFecha();
 
   registroId = null;
-
   productos = [];
 
   document.getElementById("notas")
@@ -460,6 +459,39 @@ async function cargarInventario(){
     document.getElementById("notas")
     .value =
     guardado.notas || "";
+
+    mostrar();
+
+    return;
+  }
+
+  let { data: ultimoDia } =
+  await db
+  .from("inventario")
+  .select("*")
+  .lt("Fecha", fechaInput.value)
+  .order("Fecha", { ascending:false })
+  .limit(1);
+
+  if(ultimoDia && ultimoDia.length > 0){
+
+    const guardado =
+    ultimoDia[0].Data || {};
+
+    productos =
+    (guardado.productos || []).map(p => ({
+      nombre: p.nombre,
+      inicio: (p.inicio || 0) - (p.vendido || 0),
+      vendido: 0,
+      costo: p.costo || 0,
+      venta: p.venta || 0
+    }));
+
+    await guardarInventario();
+
+    alert(
+      "Se copió automáticamente el último inventario."
+    );
   }
 
   mostrar();
