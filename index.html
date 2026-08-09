@@ -113,6 +113,7 @@ button{
 
 .btn-menos{background:#1b2233}
 .btn-borrar{background:#222;margin-bottom:10px}
+
 .btn-comisiones{
   background:#f59e0b;
   margin:12px 0;
@@ -164,29 +165,35 @@ button{
 
   <h2>Entrar al inventario</h2>
 
-  <input id="email" type="email"
-  value="htolosarodriguez@gmail.com"
-  placeholder="Correo">
+  <input
+    id="email"
+    type="email"
+    value="htolosarodriguez@gmail.com"
+    placeholder="Correo"
+  >
 
   <div style="position:relative">
 
-    <input id="password"
-    type="password"
-    placeholder="Contraseña"
-    style="padding-right:60px">
+    <input
+      id="password"
+      type="password"
+      placeholder="Contraseña"
+      style="padding-right:60px"
+    >
 
     <button
-    type="button"
-    onclick="verPassword()"
-    style="
-      position:absolute;
-      right:8px;
-      top:8px;
-      width:auto;
-      padding:10px;
-      background:#222;
-      font-size:16px;
-    ">
+      type="button"
+      onclick="verPassword()"
+      style="
+        position:absolute;
+        right:8px;
+        top:8px;
+        width:auto;
+        padding:10px;
+        background:#222;
+        font-size:16px;
+      "
+    >
       👁️
     </button>
 
@@ -200,22 +207,39 @@ button{
 
 </div>
 
+
 <div id="app" class="container oculto">
 
-  <button onclick="logout()">Cerrar sesión</button>
+  <button onclick="logout()">
+    Cerrar sesión
+  </button>
 
   <h1 id="fechaTexto"></h1>
 
-  <input id="fechaManual" type="date" onchange="cargarInventario()">
+  <input
+    id="fechaManual"
+    type="date"
+    onchange="cargarInventario()"
+  >
 
-  <button class="btn-comisiones" onclick="mostrarComisiones()">
+  <button
+    class="btn-comisiones"
+    onclick="mostrarComisiones()"
+  >
     💰 Comisiones
   </button>
 
-  <div id="seccionComisiones" class="formulario oculto">
+  <div
+    id="seccionComisiones"
+    class="formulario oculto"
+  >
+
     <h2>💰 Costos, ventas y ganancias</h2>
+
     <div id="listaComisiones"></div>
+
   </div>
+
 
   <div class="totales">
 
@@ -236,25 +260,36 @@ button{
 
   </div>
 
+
   <div id="lista"></div>
+
 
   <div class="formulario">
 
     <h2>+ Agregar producto</h2>
 
-    <input id="nombre" placeholder="Nombre del producto">
+    <input
+      id="nombre"
+      placeholder="Nombre del producto"
+    >
 
-    <input id="cantidad"
-    type="number"
-    placeholder="Cantidad inicial">
+    <input
+      id="cantidad"
+      type="number"
+      placeholder="Cantidad inicial"
+    >
 
-    <input id="costo"
-    type="number"
-    placeholder="Cuánto costó">
+    <input
+      id="costo"
+      type="number"
+      placeholder="Cuánto costó"
+    >
 
-    <input id="venta"
-    type="number"
-    placeholder="A cuánto se vende">
+    <input
+      id="venta"
+      type="number"
+      placeholder="A cuánto se vende"
+    >
 
     <button onclick="agregarProducto()">
       Agregar producto
@@ -262,28 +297,37 @@ button{
 
   </div>
 
+
   <div class="formulario">
 
     <h2>📝 Notas del día</h2>
 
-    <textarea id="notas"
-    placeholder="Notas..."></textarea>
+    <textarea
+      id="notas"
+      placeholder="Notas..."
+    ></textarea>
 
   </div>
 
 </div>
 
-<button id="btnCerrar"
-class="cerrar oculto"
-onclick="cerrarDia()">
+
+<button
+  id="btnCerrar"
+  class="cerrar oculto"
+  onclick="cerrarDia()"
+>
 🌙 Cerrar día
 </button>
 
+
 <script>
 
-const SUPABASE_URL = "https://nbeztoulibouaiwhkkzx.supabase.co";
+const SUPABASE_URL =
+"https://nbeztoulibouaiwhkkzx.supabase.co";
 
-const SUPABASE_KEY = "sb_publishable_rBfUEuSG0oN__EW38QL68w_1rJ-deQp";
+const SUPABASE_KEY =
+"sb_publishable_rBfUEuSG0oN__EW38QL68w_1rJ-deQp";
 
 const db = window.supabase.createClient(
   SUPABASE_URL,
@@ -292,29 +336,38 @@ const db = window.supabase.createClient(
 
 let productos = [];
 let registroId = null;
+let guardando = false;
 
-const fechaInput = document.getElementById("fechaManual");
+const fechaInput =
+document.getElementById("fechaManual");
 
-/* FECHA LOCAL REAL */
+
+/* =========================
+   FECHA LOCAL
+========================= */
+
 function hoyLocal(){
 
   const f = new Date();
 
   return (
     f.getFullYear() + "-" +
-    String(f.getMonth() + 1).padStart(2,"0") + "-" +
+    String(f.getMonth()+1).padStart(2,"0") + "-" +
     String(f.getDate()).padStart(2,"0")
   );
 }
 
-/* CORRIGE SI SE QUEDÓ GUARDADO MIÉRCOLES */
-let fechaGuardada = localStorage.getItem("fechaInventario");
 
-const hoy = hoyLocal();
+/* =========================
+   FECHA OPERATIVA GUARDADA
+========================= */
 
-if(!fechaGuardada || fechaGuardada > hoy){
+let fechaGuardada =
+localStorage.getItem("fechaInventario");
 
-  fechaGuardada = hoy;
+if(!fechaGuardada){
+
+  fechaGuardada = hoyLocal();
 
   localStorage.setItem(
     "fechaInventario",
@@ -323,6 +376,11 @@ if(!fechaGuardada || fechaGuardada > hoy){
 }
 
 fechaInput.value = fechaGuardada;
+
+
+/* =========================
+   CONTRASEÑA
+========================= */
 
 function verPassword(){
 
@@ -335,23 +393,36 @@ function verPassword(){
   : "password";
 }
 
+
+/* =========================
+   TEXTO DE FECHA
+========================= */
+
 function textoFecha(){
 
   const p = fechaInput.value.split("-");
 
   const f = new Date(
-    p[0],
-    p[1]-1,
-    p[2]
+    Number(p[0]),
+    Number(p[1])-1,
+    Number(p[2])
   );
 
-  return f.toLocaleDateString("es-MX",{
-    weekday:"long",
-    year:"numeric",
-    month:"long",
-    day:"numeric"
-  });
+  return f.toLocaleDateString(
+    "es-MX",
+    {
+      weekday:"long",
+      year:"numeric",
+      month:"long",
+      day:"numeric"
+    }
+  );
 }
+
+
+/* =========================
+   LOGIN
+========================= */
 
 async function iniciarSesion(){
 
@@ -378,8 +449,9 @@ async function iniciarSesion(){
     return;
   }
 
-  mostrarApp();
+  await mostrarApp();
 }
+
 
 async function logout(){
 
@@ -388,6 +460,7 @@ async function logout(){
   location.reload();
 }
 
+
 async function revisarSesion(){
 
   const { data } =
@@ -395,9 +468,14 @@ async function revisarSesion(){
 
   if(data.session){
 
-    mostrarApp();
+    await mostrarApp();
   }
 }
+
+
+/* =========================
+   ABRIR APP
+========================= */
 
 async function mostrarApp(){
 
@@ -410,10 +488,56 @@ async function mostrarApp(){
   document.getElementById("btnCerrar")
   .classList.remove("oculto");
 
+
+  /*
+    IMPORTANTE:
+    AL ENTRAR BUSCAMOS EL ÚLTIMO
+    DÍA OPERATIVO EXISTENTE.
+  */
+
+  const { data:ultimoDia, error } =
+  await db
+  .from("inventario")
+  .select("Fecha")
+  .order("Fecha",{ascending:false})
+  .limit(1);
+
+
+  if(
+    !error &&
+    ultimoDia &&
+    ultimoDia.length > 0
+  ){
+
+    fechaInput.value =
+    ultimoDia[0].Fecha;
+
+    localStorage.setItem(
+      "fechaInventario",
+      ultimoDia[0].Fecha
+    );
+
+  }else{
+
+    fechaInput.value =
+    localStorage.getItem(
+      "fechaInventario"
+    ) || hoyLocal();
+  }
+
   await cargarInventario();
 }
 
+
+/* =========================
+   CARGAR INVENTARIO
+========================= */
+
 async function cargarInventario(){
+
+  if(!fechaInput.value){
+    return;
+  }
 
   localStorage.setItem(
     "fechaInventario",
@@ -429,12 +553,14 @@ async function cargarInventario(){
   document.getElementById("notas")
   .value = "";
 
-  let { data, error } =
+
+  const { data, error } =
   await db
   .from("inventario")
   .select("*")
-  .eq("Fecha", fechaInput.value)
+  .eq("Fecha",fechaInput.value)
   .limit(1);
+
 
   if(error){
 
@@ -445,6 +571,13 @@ async function cargarInventario(){
 
     return;
   }
+
+
+  /*
+    SI EL DÍA YA EXISTE,
+    CARGAMOS EXACTAMENTE
+    LO QUE ESTÁ GUARDADO.
+  */
 
   if(data && data.length > 0){
 
@@ -465,26 +598,45 @@ async function cargarInventario(){
     return;
   }
 
-  let { data: ultimoDia } =
+
+  /*
+    SI EL DÍA NO EXISTE,
+    BUSCAMOS EL ANTERIOR.
+  */
+
+  const { data:ultimoDia } =
   await db
   .from("inventario")
   .select("*")
-  .lt("Fecha", fechaInput.value)
-  .order("Fecha", { ascending:false })
+  .lt("Fecha",fechaInput.value)
+  .order("Fecha",{ascending:false})
   .limit(1);
 
-  if(ultimoDia && ultimoDia.length > 0){
+
+  if(
+    ultimoDia &&
+    ultimoDia.length > 0
+  ){
 
     const guardado =
     ultimoDia[0].Data || {};
 
     productos =
-    (guardado.productos || []).map(p => ({
-      nombre: p.nombre,
-      inicio: (p.inicio || 0) - (p.vendido || 0),
-      vendido: 0,
-      costo: p.costo || 0,
-      venta: p.venta || 0
+    (guardado.productos || [])
+    .map(p=>({
+
+      nombre:p.nombre,
+
+      inicio:
+      (Number(p.inicio) || 0) -
+      (Number(p.vendido) || 0),
+
+      vendido:0,
+
+      costo:Number(p.costo) || 0,
+
+      venta:Number(p.venta) || 0
+
     }));
 
     await guardarInventario();
@@ -497,57 +649,92 @@ async function cargarInventario(){
   mostrar();
 }
 
+
+/* =========================
+   GUARDAR INMEDIATAMENTE
+========================= */
+
 async function guardarInventario(){
 
+  if(!fechaInput.value){
+    return false;
+  }
+
+  guardando = true;
+
   const datos = {
-    productos,
+
+    productos:productos,
+
     notas:
-    document.getElementById("notas").value,
+    document.getElementById("notas")
+    .value,
+
     actualizado:
     new Date().toISOString()
   };
+
 
   if(registroId){
 
     const { error } =
     await db
     .from("inventario")
-    .update({ Data: datos })
-    .eq("id", registroId);
+    .update({
+      Data:datos
+    })
+    .eq("id",registroId);
+
 
     if(error){
 
+      guardando = false;
+
       alert(
-        "Error al guardar: " +
+        "NO SE PUDO GUARDAR: " +
         error.message
       );
+
+      return false;
     }
 
   }else{
 
-    const { data, error } =
+    const { data,error } =
     await db
     .from("inventario")
     .insert([{
-      Fecha: fechaInput.value,
-      Data: datos
+      Fecha:fechaInput.value,
+      Data:datos
     }])
     .select()
     .single();
 
+
     if(error){
 
+      guardando = false;
+
       alert(
-        "Error al crear día: " +
+        "NO SE PUDO GUARDAR: " +
         error.message
       );
 
-      return;
+      return false;
     }
 
     registroId = data.id;
   }
+
+  guardando = false;
+
+  return true;
 }
+
+
+/* =========================
+   AGREGAR PRODUCTO
+========================= */
 
 async function agregarProducto(){
 
@@ -573,6 +760,7 @@ async function agregarProducto(){
     .value
   ) || 0;
 
+
   if(!nombre || isNaN(cantidad)){
 
     alert(
@@ -582,50 +770,128 @@ async function agregarProducto(){
     return;
   }
 
+
   productos.push({
-    nombre,
+
+    nombre:nombre,
     inicio:cantidad,
     vendido:0,
-    costo,
-    venta
+    costo:costo,
+    venta:venta
+
   });
 
-  document.getElementById("nombre").value = "";
-  document.getElementById("cantidad").value = "";
-  document.getElementById("costo").value = "";
-  document.getElementById("venta").value = "";
 
+  /*
+    SE GUARDA ANTES DE
+    CONTINUAR.
+  */
+
+  const guardado =
   await guardarInventario();
+
+
+  if(!guardado){
+    return;
+  }
+
+
+  document.getElementById("nombre")
+  .value = "";
+
+  document.getElementById("cantidad")
+  .value = "";
+
+  document.getElementById("costo")
+  .value = "";
+
+  document.getElementById("venta")
+  .value = "";
 
   mostrar();
 }
 
+
+/* =========================
+   MARCAR VENTA +
+========================= */
+
 async function vender(i){
 
-  if(productos[i].vendido <
-     productos[i].inicio){
+  if(guardando){
+    return;
+  }
+
+  if(
+    productos[i].vendido <
+    productos[i].inicio
+  ){
 
     productos[i].vendido++;
 
+    /*
+      CADA + SE GUARDA
+      INMEDIATAMENTE.
+    */
+
+    const guardado =
     await guardarInventario();
+
+    if(!guardado){
+
+      productos[i].vendido--;
+
+      mostrar();
+
+      return;
+    }
 
     mostrar();
   }
 }
 
+
+/* =========================
+   REGRESAR VENTA -
+========================= */
+
 async function regresar(i){
+
+  if(guardando){
+    return;
+  }
 
   if(productos[i].vendido > 0){
 
     productos[i].vendido--;
 
+    /*
+      CADA - SE GUARDA
+      INMEDIATAMENTE.
+    */
+
+    const guardado =
     await guardarInventario();
+
+    if(!guardado){
+
+      productos[i].vendido++;
+
+      mostrar();
+
+      return;
+    }
 
     mostrar();
   }
 }
 
-async function editarInicio(i, valor){
+
+/* =========================
+   EDITAR INICIO
+========================= */
+
+async function editarInicio(i,valor){
 
   valor = parseInt(valor);
 
@@ -638,52 +904,139 @@ async function editarInicio(i, valor){
     return;
   }
 
+
+  const inicioAnterior =
+  productos[i].inicio;
+
+  const vendidoAnterior =
+  productos[i].vendido;
+
+
   productos[i].inicio = valor;
 
-  if(productos[i].vendido > valor){
 
-    productos[i].vendido = valor;
+  if(
+    productos[i].vendido >
+    valor
+  ){
+
+    productos[i].vendido =
+    valor;
   }
 
+
+  const guardado =
   await guardarInventario();
+
+
+  if(!guardado){
+
+    productos[i].inicio =
+    inicioAnterior;
+
+    productos[i].vendido =
+    vendidoAnterior;
+
+    mostrar();
+
+    return;
+  }
 
   mostrar();
 }
 
-async function editarDato(i,campo,valor){
 
-  valor = parseFloat(valor) || 0;
+/* =========================
+   COSTO / PRECIO
+========================= */
 
-  productos[i][campo] = valor;
+async function editarDato(
+  i,
+  campo,
+  valor
+){
 
+  const anterior =
+  productos[i][campo];
+
+  valor =
+  parseFloat(valor) || 0;
+
+  productos[i][campo] =
+  valor;
+
+
+  const guardado =
   await guardarInventario();
+
+
+  if(!guardado){
+
+    productos[i][campo] =
+    anterior;
+  }
 
   mostrarComisiones(true);
 }
 
+
+/* =========================
+   BORRAR PRODUCTO
+========================= */
+
 async function borrar(i){
 
-  if(confirm("¿Borrar producto completo?")){
+  if(
+    confirm(
+      "¿Borrar producto completo?"
+    )
+  ){
+
+    const productoBorrado =
+    productos[i];
 
     productos.splice(i,1);
 
+
+    const guardado =
     await guardarInventario();
+
+
+    if(!guardado){
+
+      productos.splice(
+        i,
+        0,
+        productoBorrado
+      );
+    }
 
     mostrar();
   }
 }
 
-function mostrarComisiones(mantenerAbierto){
+
+/* =========================
+   COMISIONES
+========================= */
+
+function mostrarComisiones(
+  mantenerAbierto
+){
 
   const seccion =
   document.getElementById(
     "seccionComisiones"
   );
 
+
   if(!mantenerAbierto){
 
-    seccion.classList.toggle("oculto");
+    seccion.classList.toggle(
+      "oculto"
+    );
   }
+
 
   const lista =
   document.getElementById(
@@ -691,6 +1044,7 @@ function mostrarComisiones(mantenerAbierto){
   );
 
   lista.innerHTML = "";
+
 
   productos.forEach((p,i)=>{
 
@@ -700,27 +1054,47 @@ function mostrarComisiones(mantenerAbierto){
     if(p.venta === undefined)
       p.venta = 0;
 
+
     const ganancia =
-    p.venta - p.costo;
+    Number(p.venta) -
+    Number(p.costo);
+
 
     lista.innerHTML += `
+
       <div class="tabla-comision">
 
         <h3>${p.nombre}</h3>
 
-        <label>Cuánto costó</label>
+        <label>
+          Cuánto costó
+        </label>
 
         <input
-        type="number"
-        value="${p.costo}"
-        onchange="editarDato(${i}, 'costo', this.value)">
+          type="number"
+          value="${p.costo}"
+          onchange="
+          editarDato(
+            ${i},
+            'costo',
+            this.value
+          )"
+        >
 
-        <label>A cuánto se vende</label>
+        <label>
+          A cuánto se vende
+        </label>
 
         <input
-        type="number"
-        value="${p.venta}"
-        onchange="editarDato(${i}, 'venta', this.value)">
+          type="number"
+          value="${p.venta}"
+          onchange="
+          editarDato(
+            ${i},
+            'venta',
+            this.value
+          )"
+        >
 
         <div class="ganancia">
           Ganancia: $${ganancia}
@@ -731,18 +1105,31 @@ function mostrarComisiones(mantenerAbierto){
   });
 }
 
+
+/* =========================
+   MOSTRAR PRODUCTOS
+========================= */
+
 function mostrar(){
 
-  let lista =
+  const lista =
   document.getElementById("lista");
 
   lista.innerHTML = "";
+
 
   let inicioTotal = 0;
   let vendidoTotal = 0;
   let finalTotal = 0;
 
+
   productos.forEach((p,i)=>{
+
+    p.inicio =
+    Number(p.inicio) || 0;
+
+    p.vendido =
+    Number(p.vendido) || 0;
 
     if(p.costo === undefined)
       p.costo = 0;
@@ -750,25 +1137,36 @@ function mostrar(){
     if(p.venta === undefined)
       p.venta = 0;
 
-    let final =
+
+    const final =
     p.inicio - p.vendido;
 
+
     inicioTotal += p.inicio;
-    vendidoTotal += p.vendido;
+
+    vendidoTotal +=
+    p.vendido;
+
     finalTotal += final;
 
+
     lista.innerHTML += `
+
       <div class="card">
 
         <button
-        class="btn-borrar"
-        onclick="borrar(${i})">
+          class="btn-borrar"
+          onclick="borrar(${i})"
+        >
           🗑️ Borrar producto
         </button>
 
+
         <h2>${p.nombre}</h2>
 
+
         <div class="fila">
+
 
           <div>
 
@@ -776,12 +1174,18 @@ function mostrar(){
             <br>
 
             <input
-            type="number"
-            value="${p.inicio}"
-            class="inicio-editable"
-            onchange="editarInicio(${i}, this.value)">
+              type="number"
+              value="${p.inicio}"
+              class="inicio-editable"
+              onchange="
+              editarInicio(
+                ${i},
+                this.value
+              )"
+            >
 
           </div>
+
 
           <div>
 
@@ -789,22 +1193,27 @@ function mostrar(){
             <br>
 
             <button
-            class="btn-mini btn-menos"
-            onclick="regresar(${i})">
+              class="btn-mini btn-menos"
+              onclick="regresar(${i})"
+            >
               −
             </button>
+
 
             <span class="num verde">
               ${p.vendido}
             </span>
 
+
             <button
-            class="btn-mini"
-            onclick="vender(${i})">
+              class="btn-mini"
+              onclick="vender(${i})"
+            >
               +
             </button>
 
           </div>
+
 
           <div>
 
@@ -816,20 +1225,31 @@ function mostrar(){
 
           </div>
 
+
         </div>
 
       </div>
     `;
   });
 
-  document.getElementById("inicioTotal")
-  .innerText = inicioTotal;
 
-  document.getElementById("vendidoTotal")
-  .innerText = vendidoTotal;
+  document.getElementById(
+    "inicioTotal"
+  ).innerText =
+  inicioTotal;
 
-  document.getElementById("finalTotal")
-  .innerText = finalTotal;
+
+  document.getElementById(
+    "vendidoTotal"
+  ).innerText =
+  vendidoTotal;
+
+
+  document.getElementById(
+    "finalTotal"
+  ).innerText =
+  finalTotal;
+
 
   if(
     !document.getElementById(
@@ -837,62 +1257,134 @@ function mostrar(){
     )
     .classList.contains("oculto")
   ){
+
     mostrarComisiones(true);
   }
 }
 
+
+/* =========================
+   NOTAS
+========================= */
+
+let temporizadorNotas;
+
 document.getElementById("notas")
 .addEventListener(
   "input",
-  guardarInventario
+  function(){
+
+    clearTimeout(
+      temporizadorNotas
+    );
+
+    temporizadorNotas =
+    setTimeout(
+      guardarInventario,
+      400
+    );
+  }
 );
+
+
+/* =========================
+   CERRAR DÍA
+========================= */
 
 async function cerrarDia(){
 
-  if(!confirm("¿Cerrar este día?")){
+  if(
+    !confirm(
+      "¿Cerrar este día?"
+    )
+  ){
     return;
   }
 
+
+  /*
+    PRIMERO ASEGURAMOS
+    QUE EL DÍA ACTUAL
+    ESTÉ GUARDADO.
+  */
+
+  const guardadoActual =
   await guardarInventario();
+
+
+  if(!guardadoActual){
+
+    alert(
+      "No se cerró el día porque el inventario actual no pudo guardarse."
+    );
+
+    return;
+  }
+
+
+  /*
+    EL FINAL DE HOY
+    SE CONVIERTE EN
+    EL INICIO DE MAÑANA.
+  */
 
   const productosSiguienteDia =
   productos.map(p=>({
 
     nombre:p.nombre,
 
-    inicio:p.inicio - p.vendido,
+    inicio:
+    (Number(p.inicio) || 0) -
+    (Number(p.vendido) || 0),
 
     vendido:0,
 
-    costo:p.costo || 0,
+    costo:
+    Number(p.costo) || 0,
 
-    venta:p.venta || 0
+    venta:
+    Number(p.venta) || 0
 
   }));
+
+
+  /*
+    CALCULAR SIGUIENTE DÍA
+  */
 
   const partes =
   fechaInput.value.split("-");
 
-  const fecha = new Date(
-    partes[0],
-    partes[1]-1,
-    partes[2]
+  const fecha =
+  new Date(
+    Number(partes[0]),
+    Number(partes[1])-1,
+    Number(partes[2])
   );
+
 
   fecha.setDate(
-    fecha.getDate() + 1
+    fecha.getDate()+1
   );
 
+
   const siguienteDia =
+
     fecha.getFullYear() + "-" +
-    String(fecha.getMonth()+1)
-    .padStart(2,"0") + "-" +
-    String(fecha.getDate())
-    .padStart(2,"0");
+
+    String(
+      fecha.getMonth()+1
+    ).padStart(2,"0") + "-" +
+
+    String(
+      fecha.getDate()
+    ).padStart(2,"0");
+
 
   const datosSiguienteDia = {
 
-    productos:productosSiguienteDia,
+    productos:
+    productosSiguienteDia,
 
     notas:"",
 
@@ -900,15 +1392,22 @@ async function cerrarDia(){
     new Date().toISOString()
   };
 
-  let {
+
+  /*
+    VER SI EL SIGUIENTE
+    DÍA YA EXISTE.
+  */
+
+  const {
     data:diaExistente,
     error:errorBuscar
   } =
   await db
   .from("inventario")
   .select("*")
-  .eq("Fecha", siguienteDia)
+  .eq("Fecha",siguienteDia)
   .limit(1);
+
 
   if(errorBuscar){
 
@@ -920,8 +1419,11 @@ async function cerrarDia(){
     return;
   }
 
-  if(diaExistente &&
-     diaExistente.length > 0){
+
+  if(
+    diaExistente &&
+    diaExistente.length > 0
+  ){
 
     const { error } =
     await db
@@ -929,12 +1431,16 @@ async function cerrarDia(){
     .update({
       Data:datosSiguienteDia
     })
-    .eq("id", diaExistente[0].id);
+    .eq(
+      "id",
+      diaExistente[0].id
+    );
+
 
     if(error){
 
       alert(
-        "Error al actualizar siguiente día: " +
+        "Error al actualizar el siguiente día: " +
         error.message
       );
 
@@ -947,14 +1453,19 @@ async function cerrarDia(){
     await db
     .from("inventario")
     .insert([{
+
       Fecha:siguienteDia,
-      Data:datosSiguienteDia
+
+      Data:
+      datosSiguienteDia
+
     }]);
+
 
     if(error){
 
       alert(
-        "Error al crear siguiente día: " +
+        "Error al crear el siguiente día: " +
         error.message
       );
 
@@ -962,19 +1473,34 @@ async function cerrarDia(){
     }
   }
 
-  fechaInput.value = siguienteDia;
+
+  /*
+    CAMBIAMOS AL NUEVO
+    DÍA OPERATIVO.
+  */
+
+  fechaInput.value =
+  siguienteDia;
+
 
   localStorage.setItem(
     "fechaInventario",
     siguienteDia
   );
 
+
   await cargarInventario();
 
+
   alert(
-    "Día cerrado. Todos los datos pasaron al siguiente día."
+    "Día cerrado correctamente. El inventario final pasó al siguiente día."
   );
 }
+
+
+/* =========================
+   INICIAR
+========================= */
 
 revisarSesion();
 
